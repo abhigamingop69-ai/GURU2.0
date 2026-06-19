@@ -21,14 +21,14 @@ export default function Subjects() {
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-4xl mx-auto min-h-[calc(100vh-4rem)]">
-      <div className="flex bg-card rounded-xl p-1 shadow-sm border border-border">
+      <div className="flex bg-background rounded-2xl p-1 gap-2 shadow-sm border-2 border-border mb-4">
         {[11, 12].map((g) => (
           <button
             key={g}
             onClick={() => setSelectedGrade(g as Grade)}
             className={cn(
-              "flex-1 py-2 font-bold rounded-lg transition-all",
-              currentGrade === g ? "bg-primary text-white shadow-sm" : "text-foreground/60 hover:text-foreground"
+              "flex-1 py-3 font-bold rounded-xl transition-all border-2 border-b-4",
+              currentGrade === g ? "bg-primary border-primary border-b-primary-dark text-white active:border-b-0 active:translate-y-[4px]" : "bg-card border-border text-foreground/60 active:border-b-0 active:translate-y-[4px] hover:bg-card-foreground/5 text-lg"
             )}
           >
             Grade {g}
@@ -43,14 +43,14 @@ export default function Subjects() {
             <button
               key={subject.id}
               onClick={() => navigate(`/subjects/${subject.id}`)}
-              className="bg-card p-5 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border flex flex-col items-center text-center gap-3 active:scale-95 transition-transform hover:-translate-y-1 hover:shadow-md"
+              className="card-duo p-5 flex flex-col items-center text-center gap-3"
             >
-              <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                <Icon className="w-7 h-7" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-primary/20">
+                <Icon className="w-8 h-8 stroke-[2.5]" />
               </div>
               <div>
-                <h3 className="font-heading font-bold text-lg leading-tight">{subject.name}</h3>
-                <p className="text-sm text-foreground/60 font-medium mt-1">{subject.chapterCount} Chapters</p>
+                <h3 className="font-heading font-bold text-lg leading-tight text-foreground">{subject.name}</h3>
+                <p className="text-sm text-foreground/60 font-bold uppercase tracking-wide mt-1">{subject.chapterCount} Chapters</p>
               </div>
             </button>
           )

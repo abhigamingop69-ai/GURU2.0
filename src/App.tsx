@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
+import { useEffect } from 'react';
 import Layout from './components/Layout';
 import Onboarding from './pages/Onboarding';
 import Auth from './pages/Auth';
@@ -14,7 +15,15 @@ import Welcome from './pages/Welcome';
 import ChessGame from './pages/ChessGame';
 
 export default function App() {
-  const { sessionToken, onboardingComplete } = useStore();
+  const { sessionToken, onboardingComplete, theme } = useStore();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   if (!onboardingComplete) {
     return <Onboarding />;

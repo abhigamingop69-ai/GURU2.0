@@ -13,13 +13,14 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-2xl mx-auto">
       {/* Header */}
-      <header className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-10 py-2 -mx-4 px-4">
-        <h1 className="text-xl font-heading font-bold">Good morning, {user?.name?.split(' ')[0]} 👋</h1>
-        <div className="flex items-center gap-3">
-          <button className="w-10 h-10 rounded-full bg-card hover:bg-card-foreground/5 flex items-center justify-center transition-colors relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-card"></span>
-          </button>
+      <header className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-10 py-3 -mx-4 px-4 border-b border-white/5 md:border-transparent gap-4">
+        <div className="flex flex-col min-w-0">
+          <div className="flex items-center mb-1">
+            <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-16 object-contain md:hidden shrink-0" />
+          </div>
+          <h1 className="text-xl font-heading font-bold leading-tight truncate">Good morning, {user?.name?.split(' ')[0]} 👋</h1>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
           <button onClick={() => navigate('/settings')} className="w-10 h-10 rounded-full bg-card hover:bg-card-foreground/5 flex items-center justify-center transition-colors">
             <SettingsIcon className="w-5 h-5" />
           </button>
@@ -52,7 +53,7 @@ function AdBanner() {
   }, [banners.length]);
 
   return (
-    <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden shadow-sm">
+    <div className="relative w-full h-40 md:h-48 rounded-3xl overflow-hidden shadow-sm border-b-[6px] border-black/10">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -79,16 +80,16 @@ function DailyStreak({ streakCount }: { streakCount: number }) {
   const message = streakCount >= 7 ? "You're on fire! Don't break the chain." : streakCount > 0 ? "Keep it going!" : "Start your streak today!";
 
   return (
-    <div className="bg-card p-5 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border cursor-pointer active:scale-[0.98] transition-transform">
-      <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2">
+    <div className="card-duo p-5 cursor-pointer">
+      <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
         <span>🔥</span> {streakCount}-Day Streak!
       </h3>
-      <p className="text-sm font-medium text-foreground/70 mb-4">{message}</p>
+      <p className="text-sm font-bold text-foreground/70 mb-4">{message}</p>
       <div className="flex justify-between items-center px-1">
         {[...Array(7)].map((_, i) => (
           <div key={i} className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors",
-            i < Math.min(streakCount, 7) || (i===0 && isComplete) ? "bg-primary text-white" : "border-2 border-border text-foreground/40"
+            "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-colors border-2",
+            i < Math.min(streakCount, 7) || (i===0 && isComplete) ? "bg-orange-500 border-orange-600 text-white" : "border-border text-foreground/40 bg-card"
           )}>
             {["M", "T", "W", "T", "F", "S", "S"][i]}
           </div>
@@ -112,10 +113,10 @@ function FlashcardWidget() {
   };
 
   return (
-    <div className="bg-card rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border p-5 relative perspective-1000">
+    <div className="card-duo p-5 relative perspective-1000">
       <div className="flex justify-between items-center mb-4">
-        <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-1 rounded-md">{card.subject}</span>
-        <button onClick={handleNext} className="text-sm font-semibold text-primary hover:underline">Next Card</button>
+        <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-1 rounded-lg">{card.subject}</span>
+        <button onClick={handleNext} className="text-sm font-bold text-primary active:scale-95 transition-transform uppercase tracking-wide">Next Card</button>
       </div>
 
       <div 
@@ -123,11 +124,11 @@ function FlashcardWidget() {
         style={{ transform: isFlipped ? 'rotateX(180deg)' : 'rotateX(0deg)' }}
         onClick={() => setIsFlipped(!isFlipped)}
       >
-        <div className="absolute inset-0 backface-hidden flex items-center justify-center p-4 bg-background border border-border rounded-xl shadow-sm">
-          <p className="text-lg font-medium text-center">{card.front}</p>
+        <div className="absolute inset-0 backface-hidden flex items-center justify-center p-4 bg-background border-2 border-b-[6px] border-border rounded-2xl">
+          <p className="text-lg font-bold text-center text-foreground uppercase tracking-wide">{card.front}</p>
         </div>
-        <div className="absolute inset-0 backface-hidden flex items-center justify-center p-4 bg-primary/5 border border-primary/20 rounded-xl shadow-sm [transform:rotateX(180deg)]">
-          <p className="text-base font-medium text-center">{card.back}</p>
+        <div className="absolute inset-0 backface-hidden flex items-center justify-center p-4 bg-primary/10 border-2 border-b-[6px] border-primary/30 rounded-2xl [transform:rotateX(180deg)]">
+          <p className="text-base font-bold text-center text-primary uppercase tracking-wide">{card.back}</p>
         </div>
       </div>
     </div>
@@ -143,21 +144,21 @@ function TriviaWidget() {
   };
 
   return (
-    <div className="bg-card p-5 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-border">
-      <h3 className="font-heading font-bold text-lg mb-3 flex items-center gap-2">
+    <div className="card-duo p-5">
+      <h3 className="font-heading font-bold text-xl mb-3 flex items-center gap-2 text-purple-500">
         <span>🧠</span> Daily Trivia
       </h3>
-      <p className="font-medium mb-4">{mockTrivia.questionText}</p>
-      <div className="space-y-2">
+      <p className="font-bold mb-4 text-foreground/80">{mockTrivia.questionText}</p>
+      <div className="space-y-3">
         {mockTrivia.options.map((opt, idx) => {
-          let btnClass = "border-border bg-background hover:border-primary/50 text-foreground";
+          let btnClass = "border-border border-b-4 bg-background hover:bg-card-foreground/5 text-foreground";
           if (selectedOpt !== null) {
             if (idx === mockTrivia.correctIndex) {
-              btnClass = "border-primary bg-primary/10 text-primary";
+              btnClass = "border-primary border-b-primary-dark bg-primary/10 text-primary";
             } else if (idx === selectedOpt) {
-              btnClass = "border-error bg-error/10 text-error";
+              btnClass = "border-error border-b-error bg-error/10 text-error";
             } else {
-              btnClass = "border-border bg-background opacity-50";
+              btnClass = "border-border border-b-2 bg-background opacity-50";
             }
           }
 
@@ -165,7 +166,7 @@ function TriviaWidget() {
             <button
               key={idx}
               onClick={() => handleSelect(idx)}
-              className={cn("w-full text-left p-3 rounded-xl border-2 font-medium transition-all duration-200", btnClass)}
+              className={cn("w-full text-left p-3 rounded-2xl border-2 font-bold transition-all duration-200 active:border-b-2 active:translate-y-[2px]", btnClass)}
               disabled={selectedOpt !== null}
             >
               {opt}
@@ -174,8 +175,9 @@ function TriviaWidget() {
         })}
       </div>
       {selectedOpt !== null && (
-        <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="mt-4 p-3 bg-background rounded-lg border border-border text-sm font-medium">
-          <span className="font-bold">{selectedOpt === mockTrivia.correctIndex ? 'Correct!' : 'Incorrect.'}</span> {mockTrivia.explanation}
+        <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="mt-4 p-4 bg-primary/10 rounded-2xl border-2 border-primary/20 text-sm font-medium">
+          <span className="font-bold text-primary block text-lg mb-1">{selectedOpt === mockTrivia.correctIndex ? 'Correct!' : 'Incorrect.'}</span> 
+          <span className="text-foreground/80 font-bold">{mockTrivia.explanation}</span>
         </motion.div>
       )}
     </div>
@@ -184,21 +186,19 @@ function TriviaWidget() {
 
 function ChessShortcut() {
   return (
-    <div className="bg-[#1F2F36] rounded-2xl overflow-hidden shadow-lg border border-[#2A3F48] text-white">
-      <div className="p-5 pb-0 flex items-start justify-between">
-        <div>
-          <h3 className="font-heading font-bold text-xl flex items-center gap-2">
-            <span>♞</span> Chess Corner
-          </h3>
-          <p className="text-white/70 text-sm mt-1 font-medium">Sharpen your mind between study sessions.</p>
-        </div>
+    <div className="bg-[#1F2F36] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#2A3F48] text-white">
+      <div className="p-5 pb-0 flex flex-col items-center text-center">
+        <h3 className="font-heading font-bold text-2xl flex items-center gap-2 mb-2">
+          <span className="text-3xl">♞</span> Chess Corner
+        </h3>
+        <p className="text-white/70 text-sm font-bold">Sharpen your mind between study sessions.</p>
       </div>
       
       <div className="p-5 flex gap-3">
-        <Link to="/chess?mode=bot" className="flex-1 bg-white hover:bg-gray-100 text-[#1F2F36] py-3 rounded-xl font-bold text-center transition-transform active:scale-95">
-          Play vs Bot
+        <Link to="/chess?mode=bot" className="flex-1 bg-white hover:bg-gray-100 text-[#1F2F36] py-3 rounded-2xl font-bold text-center border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wide">
+          Play Bot
         </Link>
-        <Link to="/chess?mode=local" className="flex-1 bg-[#2A3F48] hover:bg-[#324b55] py-3 rounded-xl font-bold text-center transition-transform active:scale-95">
+        <Link to="/chess?mode=local" className="flex-1 bg-[#2A3F48] hover:bg-[#324b55] py-3 rounded-2xl font-bold text-center border-b-4 border-[#1F2F36] active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wide">
           1v1 Local
         </Link>
       </div>

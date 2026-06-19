@@ -23,26 +23,30 @@ export default function ChapterList() {
         <h1 className="text-xl font-heading font-bold">{subject.name}</h1>
       </header>
 
-      <div className="flex flex-col p-4 gap-3">
+      <div className="flex flex-col p-4 gap-4">
         {chapters.length === 0 ? (
-          <p className="text-foreground/60 text-center py-10 font-medium tracking-tight">No chapters available for this subject yet.</p>
+          <p className="text-foreground/60 text-center py-10 font-bold uppercase tracking-wider">No chapters available for this subject yet.</p>
         ) : (
           chapters.map(chapter => (
             <div 
               key={chapter.id}
               onClick={() => navigate(`/subjects/${subjectId}/chapter/${chapter.id}`)}
-              className="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+              className="card-duo p-5 flex items-center justify-between cursor-pointer"
             >
               <div className="flex-1 pr-4">
-                <div className="text-xs font-bold text-accent uppercase tracking-wider mb-1">Chapter {chapter.orderIndex}</div>
-                <h3 className="font-bold text-lg leading-tight mb-2">{chapter.title}</h3>
+                <div className="text-xs font-bold text-primary uppercase tracking-wider mb-1 bg-primary/10 inline-block px-2 py-0.5 rounded-lg border border-primary/20">Chapter {chapter.orderIndex}</div>
+                <h3 className="font-bold text-xl leading-tight mb-3 text-foreground">{chapter.title}</h3>
                 
                 {/* Progress bar */}
-                <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: `${chapter.progress}%` }}></div>
+                <div className="h-3 w-full bg-border rounded-full overflow-hidden border border-border">
+                  <div className="h-full bg-primary rounded-full relative" style={{ width: `${chapter.progress}%` }}>
+                    <div className="absolute top-0 bottom-0 right-0 w-8 bg-white/20 -skew-x-12 translate-x-4"></div>
+                  </div>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-foreground/40" />
+              <div className="w-10 h-10 rounded-full bg-border/50 flex items-center justify-center flex-shrink-0 border-2 border-transparent">
+                <ChevronRight className="w-6 h-6 text-foreground/50 stroke-[2.5]" />
+              </div>
             </div>
           ))
         )}

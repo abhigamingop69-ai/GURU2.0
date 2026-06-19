@@ -31,6 +31,10 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col p-6 items-center justify-center">
+      <div className="w-full flex justify-center mb-6">
+        <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-24 object-contain hidden md:block" />
+        <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-20 object-contain block md:hidden" />
+      </div>
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-6 space-y-6 border border-border">
         
         <div className="flex bg-background rounded-full p-1 relative">
@@ -102,7 +106,7 @@ export default function Auth() {
                       type="button"
                       onClick={() => setGrade(g as Grade)}
                       className={cn(
-                        "flex-1 h-12 rounded-xl font-bold border-2 transition-all",
+                        "flex-1 h-12 font-bold rounded-2xl transition-all border-2 border-b-4 active:border-b-2 active:translate-y-[2px]",
                         grade === g ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground/60"
                       )}
                     >
@@ -136,7 +140,7 @@ export default function Auth() {
 
           <button
             type="submit"
-            className="w-full h-14 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg active:scale-95 transition-all shadow-[0_4px_0_rgb(70,163,2)] mt-6"
+            className="w-full h-14 mt-6 btn-primary text-lg"
           >
             {isLogin ? "Log In" : "Sign Up"}
           </button>

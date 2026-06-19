@@ -51,7 +51,11 @@ export default function Onboarding() {
             className="flex flex-col items-center text-center space-y-6"
           >
             <div className="w-48 h-48 rounded-full bg-card shadow-lg flex items-center justify-center mb-4">
-               <SlideIcon className={cn("w-24 h-24", slides[currentSlide].color)} />
+               {currentSlide === 0 ? (
+                 <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-[11rem] h-[11rem] object-contain" />
+               ) : (
+                 <SlideIcon className={cn("w-24 h-24", slides[currentSlide].color)} />
+               )}
             </div>
             <h1 className="text-3xl font-heading font-bold text-foreground">
               {slides[currentSlide].title}
@@ -78,7 +82,7 @@ export default function Onboarding() {
         
         <button
           onClick={handleNext}
-          className="w-full h-14 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg active:scale-95 transition-all shadow-[0_4px_0_rgb(70,163,2)]"
+          className="w-full h-14 btn-primary text-lg"
         >
           {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
         </button>

@@ -75,12 +75,12 @@ export default function GuruTV() {
       <header className="sticky top-0 bg-background/90 backdrop-blur-md z-10 pt-4 pb-2 -mx-4 px-4">
         <h1 className="text-2xl font-heading font-bold mb-4">Guru TV</h1>
         
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2 items-center">
           <button
             onClick={() => setActiveSubject('All')}
             className={cn(
-              "whitespace-nowrap px-4 py-1.5 rounded-full font-bold text-sm transition-colors border",
-              activeSubject === 'All' ? "bg-primary text-white border-primary" : "bg-card border-border text-foreground/70"
+              "whitespace-nowrap px-4 py-2 font-bold text-sm transition-all rounded-2xl border-2 active:translate-y-1 active:border-b-2",
+              activeSubject === 'All' ? "bg-primary border-primary border-b-[4px] border-b-primary-dark text-white" : "bg-card border-border border-b-[4px] text-foreground/70"
             )}
           >
             All Subjects
@@ -90,8 +90,8 @@ export default function GuruTV() {
               key={sub.id}
               onClick={() => setActiveSubject(sub.id)}
               className={cn(
-                "whitespace-nowrap px-4 py-1.5 rounded-full font-bold text-sm transition-colors border",
-                activeSubject === sub.id ? "bg-primary text-white border-primary" : "bg-card border-border text-foreground/70"
+                "whitespace-nowrap px-4 py-2 font-bold text-sm transition-all rounded-2xl border-2 active:translate-y-1 active:border-b-2",
+                activeSubject === sub.id ? "bg-primary border-primary border-b-[4px] border-b-primary-dark text-white" : "bg-card border-border border-b-[4px] text-foreground/70"
               )}
             >
               {sub.name}
@@ -103,25 +103,25 @@ export default function GuruTV() {
       <div className="flex flex-col p-4 gap-6">
         {filteredVideos.map(video => (
           <div key={video.id} onClick={() => setActiveVideo(video.id)} className="cursor-pointer group">
-            <div className="relative w-full aspect-video bg-card rounded-2xl overflow-hidden mb-3 border border-border shadow-sm group-active:scale-[0.98] transition-transform">
+            <div className="relative w-full aspect-video bg-card rounded-3xl overflow-hidden mb-3 border-2 border-border border-b-[6px] shadow-sm active:translate-y-1 active:border-b-2 transition-all">
               <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <PlayCircle className="w-16 h-16 text-white" />
+                <PlayCircle className="w-16 h-16 text-white stroke-[2.5]" />
               </div>
-              <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+              <div className="absolute bottom-3 right-3 bg-black/70 text-white text-[12px] font-bold px-2 py-1 rounded-xl uppercase tracking-wider backdrop-blur-sm">
                 {video.duration}
               </div>
             </div>
-            <div className="flex px-1">
+            <div className="flex px-2">
               <div className="flex-1">
-                <h3 className="font-bold text-lg leading-tight mb-1 group-hover:text-primary transition-colors">{video.title}</h3>
-                <p className="text-xs text-foreground/60 font-medium">{video.channelName} • {mockSubjects.find(s=>s.id===video.subjectId)?.name}</p>
+                <h3 className="font-bold text-xl leading-tight mb-1 group-hover:text-primary transition-colors text-foreground">{video.title}</h3>
+                <p className="text-sm text-foreground/60 font-bold uppercase tracking-wide">{video.channelName} • {mockSubjects.find(s=>s.id===video.subjectId)?.name}</p>
               </div>
             </div>
           </div>
         ))}
         {filteredVideos.length === 0 && (
-          <div className="text-center py-20 text-foreground/50 font-medium">No videos found for this subject.</div>
+          <div className="text-center py-20 text-foreground/50 font-bold uppercase tracking-wider">No videos found for this subject.</div>
         )}
       </div>
     </div>
