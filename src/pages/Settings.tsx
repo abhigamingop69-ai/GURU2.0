@@ -106,6 +106,12 @@ export default function Settings() {
             </div>
             <span className="text-[13px] text-primary font-black uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">AashishDevkota</span>
           </div>
+          <button onClick={() => window.location.reload()} className="p-4 border-b-2 border-border font-bold hover:bg-card-foreground/5 transition-colors text-left flex justify-between items-center group">
+            <div className="flex items-center gap-3">
+              <span className="font-bold">Check for Updates</span>
+            </div>
+            <span className="text-xs uppercase tracking-wider text-primary font-bold">Refresh</span>
+          </button>
           <button onClick={() => setModalType('terms')} className="p-4 border-b-2 border-border font-bold hover:bg-card-foreground/5 transition-colors text-left flex justify-between items-center group">
             Terms of Service
           </button>
