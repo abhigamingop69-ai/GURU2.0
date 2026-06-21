@@ -99,12 +99,12 @@ export default function Settings() {
             </div>
             <span className="text-sm text-foreground/50 font-bold uppercase">1.2.0</span>
           </div>
-          <div className="p-4 border-b-2 border-border flex items-center justify-between bg-primary/5">
-            <div className="flex items-center gap-3 text-primary">
+          <div className="p-4 border-b-2 border-border flex items-center gap-4 bg-primary/5">
+            <div className="flex items-center gap-3 text-primary shrink-0">
               <PenTool className="w-6 h-6" />
               <span className="font-bold">Developer</span>
             </div>
-            <span className="text-[13px] text-primary font-black uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">AashishDevkota</span>
+            <span className="text-[13px] text-primary font-black uppercase tracking-widest bg-primary/10 text-center truncate px-3 py-1 rounded-full border border-primary/20 ml-auto">AashishDevkota</span>
           </div>
           <button onClick={() => window.location.reload()} className="p-4 border-b-2 border-border font-bold hover:bg-card-foreground/5 transition-colors text-left flex justify-between items-center group">
             <div className="flex items-center gap-3">
