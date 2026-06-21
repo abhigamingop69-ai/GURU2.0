@@ -5,10 +5,10 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 
-// Piece SVGs mapping (basic unicode for brevity or simple SVGs)
+// Piece SVGs mapping with text variation selector to force monochrome rendering
 const pieceMap: Record<string, string> = {
-  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚',
-  'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔'
+  'p': '♟\uFE0E', 'n': '♞\uFE0E', 'b': '♝\uFE0E', 'r': '♜\uFE0E', 'q': '♛\uFE0E', 'k': '♚\uFE0E',
+  'P': '♟\uFE0E', 'N': '♞\uFE0E', 'B': '♝\uFE0E', 'R': '♜\uFE0E', 'Q': '♛\uFE0E', 'K': '♚\uFE0E'
 };
 
 const pieceValues: Record<string, number> = {
@@ -160,6 +160,19 @@ export default function ChessGame() {
   const ranks = mode === 'local' && game.turn() === 'b' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]; // Flip for local
   const files = mode === 'local' && game.turn() === 'b' ? ['h','g','f','e','d','c','b','a'] : ['a','b','c','d','e','f','g','h'];
 
+  const isBottomWhite = ranks[0] === 8;
+  const topColor = isBottomWhite ? 'b' : 'w';
+  const bottomColor = isBottomWhite ? 'w' : 'b';
+
+  const handleReset = () => {
+    setGame(new Chess());
+    setSelectedSquare(null);
+    setLegalMoves([]);
+    if (mode === 'local') {
+      setTurnIndicator('w');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-[#302E2B] z-50 flex flex-col items-center">
       <header className="w-full flex items-center justify-between p-4 text-white">
@@ -167,7 +180,7 @@ export default function ChessGame() {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <span className="font-heading font-bold text-lg">{mode === 'bot' ? 'vs Bot' : 'Local 1v1'}</span>
-        <button onClick={() => setGame(new Chess())} className="p-2 bg-white/10 rounded-full active:scale-95">
+        <button onClick={handleReset} className="p-2 bg-white/10 rounded-full active:scale-95">
           <RotateCcw className="w-6 h-6" />
         </button>
       </header>
@@ -199,7 +212,17 @@ export default function ChessGame() {
         </div>
       )}
 
-      <div className="flex-1 w-full flex items-center justify-center p-4">
+      <div className="flex-1 w-full flex flex-col items-center justify-center p-4">
+        {/* Top Player Info */}
+        <div className="w-full max-w-md flex justify-between items-end mb-3">
+           <div className="flex items-center gap-2 text-white">
+             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-2xl">
+               {topColor === 'w' ? pieceMap['K'] : pieceMap['k']}
+             </div>
+             <span className="font-bold text-lg">{topColor === 'w' ? 'White' : (mode === 'bot' ? 'Bot Level ' + (botLevel !== null ? ['Noob','Pro','God','Legend'][botLevel] : '') : 'Black')}</span>
+           </div>
+        </div>
+
         <div className="w-full max-w-md aspect-square flex flex-col relative" style={{boxShadow: '0 0 20px rgba(0,0,0,0.5)'}}>
            {ranks.map((rank, ri) => (
              <div key={rank} className="flex-1 flex">
@@ -247,13 +270,25 @@ export default function ChessGame() {
              </div>
            ))}
         </div>
+        
+        {/* Bottom Player Info */}
+        <div className="w-full max-w-md flex justify-between items-start mt-3">
+           <div className="flex items-center gap-2 text-white">
+             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-2xl">
+               {bottomColor === 'w' ? pieceMap['K'] : pieceMap['k']}
+             </div>
+             <span className="font-bold text-lg">{bottomColor === 'w' ? (mode === 'bot' ? 'You' : 'White') : 'Black'}</span>
+           </div>
+        </div>
       </div>
 
       {game.isGameOver() && (
-        <div className="absolute inset-x-0 bottom-0 top-auto bg-black/90 p-8 flex flex-col items-center justify-center rounded-t-3xl text-white">
+        <div className="absolute inset-x-0 bottom-0 top-auto bg-black/90 p-8 flex flex-col items-center justify-center rounded-t-3xl text-white z-40">
            <h2 className="text-3xl font-heading font-bold mb-2">Game Over</h2>
-           <p className="text-xl mb-8 opacity-80">{game.isCheckmate() ? "Checkmate!" : "Draw"}</p>
-           <button onClick={() => setGame(new Chess())} className="w-full max-w-sm py-4 bg-[#7FA650] rounded-xl font-bold text-xl active:scale-95 shadow-[0_4px_0_#537133]">
+           <p className="text-xl mb-8 opacity-80">
+             {game.isCheckmate() ? "Checkmate!" : "Draw"}
+           </p>
+           <button onClick={handleReset} className="w-full max-w-sm py-4 bg-[#7FA650] rounded-xl font-bold text-xl active:scale-95 shadow-[0_4px_0_#537133]">
              Play Again
            </button>
         </div>
