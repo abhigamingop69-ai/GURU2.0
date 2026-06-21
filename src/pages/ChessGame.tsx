@@ -133,17 +133,22 @@ export default function ChessGame() {
           let bestMove = null;
           let bestValue = -Infinity;
           
+          // Shuffle moves to add variety
+          const shuffledMoves = [...moves].sort(() => Math.random() - 0.5);
+
           // simplified root minimax
-          for(let i=0; i<moves.length; i++) {
-            game.move(moves[i]);
-            const boardValue = minimax(game, depth - 1, -Infinity, Infinity, false);
+          for(let i=0; i<shuffledMoves.length; i++) {
+            game.move(shuffledMoves[i]);
+            const baseValue = minimax(game, depth - 1, -Infinity, Infinity, false);
+            // Add tiny random noise (0 to 0.1) to break ties among moves with equal evaluation
+            const boardValue = baseValue + (Math.random() * 0.1);
             game.undo();
             if (boardValue > bestValue) {
                bestValue = boardValue;
-               bestMove = moves[i];
+               bestMove = shuffledMoves[i];
             }
           }
-          if (!bestMove) bestMove = moves[0];
+          if (!bestMove) bestMove = shuffledMoves[0];
           makeMove(bestMove);
         }
       }, 500);
