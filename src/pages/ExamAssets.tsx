@@ -10,7 +10,7 @@ export default function ExamAssets() {
   const { user } = useStore();
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(user?.grade || 11);
+  const currentGrade = user?.grade || 11;
   const [selectedSubject, setSelectedSubject] = useState<string>('All');
   const [selectedExamType, setSelectedExamType] = useState<string>('All');
   
@@ -18,14 +18,14 @@ export default function ExamAssets() {
 
   const subjectsToFilter = useMemo(() => {
     return mockSubjects.filter(s => 
-      s.grade === selectedGrade && 
+      s.grade === currentGrade && 
       (!s.stream || s.stream === user?.stream)
     );
-  }, [selectedGrade, user?.stream]);
+  }, [currentGrade, user?.stream]);
 
   const filteredQuestions = useMemo(() => {
     return mockExamQuestions.filter(q => {
-      if (q.grade !== selectedGrade) return false;
+      if (q.grade !== currentGrade) return false;
       if (selectedSubject !== 'All' && q.subjectId !== selectedSubject) return false;
       if (selectedExamType !== 'All' && q.examType !== selectedExamType) return false;
       if (searchQuery && !q.questionText.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -36,7 +36,7 @@ export default function ExamAssets() {
 
       return true;
     });
-  }, [selectedGrade, selectedSubject, selectedExamType, searchQuery, user?.stream]);
+  }, [currentGrade, selectedSubject, selectedExamType, searchQuery, user?.stream]);
 
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen">
@@ -57,22 +57,6 @@ export default function ExamAssets() {
 
         {/* Filters */}
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
-          {/* Grade Toggle */}
-          <div className="flex bg-card rounded-lg border border-border p-1 shrink-0">
-            {[11, 12].map(g => (
-              <button
-                key={g}
-                onClick={() => { setSelectedGrade(g as Grade); setSelectedSubject('All'); }}
-                className={cn(
-                  "px-3 py-1 text-sm font-bold rounded-md transition-colors",
-                  selectedGrade === g ? "bg-primary text-white" : "text-foreground/60"
-                )}
-              >
-                Gr {g}
-              </button>
-            ))}
-          </div>
-
           {/* Subject Dropdown */}
           <select
             value={selectedSubject}

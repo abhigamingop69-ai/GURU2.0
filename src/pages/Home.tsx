@@ -85,7 +85,7 @@ function StudentBanner({ user }: { user: User | null }) {
         {/* Header Section Inside Banner */}
         <div className="flex justify-between items-start gap-4">
           <div className="flex gap-4 items-center">
-             <div className="w-14 h-14 shrink-0 p-1 flex justify-center items-center">
+             <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 p-1 flex justify-center items-center">
                <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-full h-full object-contain" />
              </div>
              <div>

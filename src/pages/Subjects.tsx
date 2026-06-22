@@ -8,12 +8,12 @@ import * as Icons from 'lucide-react';
 import { Search } from 'lucide-react';
 
 export default function Subjects() {
-  const { selectedGrade, setSelectedGrade, user } = useStore();
+  const { user } = useStore();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Safe fallback if selectedGrade is not set
-  const currentGrade = selectedGrade || 11;
+  // Safe fallback if user grade is not set (should not happen if logged in)
+  const currentGrade = user?.grade || 11;
 
   const subjects = useMemo(() => {
     return mockSubjects.filter(s => 
@@ -28,16 +28,19 @@ export default function Subjects() {
     const query = searchQuery.toLowerCase();
     
     const matchedSubjects = mockSubjects.filter(s => 
-      s.name.toLowerCase().includes(query)
+      s.name.toLowerCase().includes(query) && s.grade === currentGrade
     );
     
+    const validSubjectIds = new Set(mockSubjects.filter(s => s.grade === currentGrade).map(s => s.id));
+
     const matchedChapters = mockChapters.filter(c => 
-      c.title.toLowerCase().includes(query) || 
-      c.summaryContent.toLowerCase().includes(query)
+      validSubjectIds.has(c.subjectId) &&
+      (c.title.toLowerCase().includes(query) || 
+       c.summaryContent.toLowerCase().includes(query))
     );
 
     return { subjects: matchedSubjects, chapters: matchedChapters };
-  }, [searchQuery]);
+  }, [searchQuery, currentGrade]);
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-4xl mx-auto min-h-[calc(100vh-4rem)]">
@@ -54,21 +57,6 @@ export default function Subjects() {
 
       {!searchQuery.trim() ? (
         <>
-          <div className="flex bg-background rounded-2xl p-1 gap-2 shadow-sm border-2 border-border mb-4">
-            {[11, 12].map((g) => (
-              <button
-                key={g}
-                onClick={() => setSelectedGrade(g as Grade)}
-                className={cn(
-                  "flex-1 py-3 font-bold rounded-xl transition-all border-2 border-b-4",
-                  currentGrade === g ? "bg-primary border-primary border-b-primary-dark text-white active:border-b-0 active:translate-y-[4px]" : "bg-card border-border text-foreground/60 active:border-b-0 active:translate-y-[4px] hover:bg-card-foreground/5 text-lg"
-                )}
-              >
-                Grade {g}
-              </button>
-            ))}
-          </div>
-
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {subjects.length > 0 ? (
               subjects.map(subject => {

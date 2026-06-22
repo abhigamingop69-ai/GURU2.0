@@ -320,7 +320,10 @@ export default function Settings() {
                 <p className="font-bold text-foreground/80 text-lg">Are you sure you want to log out?</p>
                 <div className="flex gap-3">
                   <button onClick={() => setModalType('none')} className="btn-outline flex-1 h-12">Cancel</button>
-                  <button onClick={() => logout()} className="btn-primary bg-error border-error hover:bg-error/90 active:border-b-0 border-b-4 flex-1 h-12 text-white">Log Out</button>
+                  <button onClick={async () => {
+                    await import('../lib/supabase').then(({ supabase }) => supabase.auth.signOut());
+                    logout();
+                  }} className="btn-primary bg-error border-error hover:bg-error/90 active:border-b-0 border-b-4 flex-1 h-12 text-white">Log Out</button>
                 </div>
               </div>
             ) : (
