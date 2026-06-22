@@ -4,7 +4,7 @@ import { Settings as SettingsIcon, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
-import { mockFlashcards, mockTrivia } from '../data/mockData';
+import { mockFlashcards, mockTriviaList } from '../data/mockData';
 import { User } from '../types';
 
 export default function Home() {
@@ -13,23 +13,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-2xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 py-3 -mx-4 px-4 border-b border-white/5 md:border-transparent gap-4">
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center mb-1">
-            <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-16 object-contain md:hidden shrink-0" />
-          </div>
-          <h1 className="text-xl font-heading font-bold leading-tight truncate">Good morning, {user?.name?.split(' ')[0]} 👋</h1>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <button onClick={() => navigate('/settings')} className="w-10 h-10 rounded-full bg-card hover:bg-card-foreground/5 flex items-center justify-center transition-colors">
-            <SettingsIcon className="w-5 h-5" />
-          </button>
-        </div>
-      </header>
-
-      <AdBanner />
-      <DailyStreak user={user} />
+      <StudentBanner user={user} />
       <FlashcardWidget />
       <TriviaWidget />
       <ChessShortcut />
@@ -39,44 +23,8 @@ export default function Home() {
 
 // Subcomponents
 
-function AdBanner() {
-  const banners = [
-    { title: "Master Accounts This Week", bg: "bg-blue-500" },
-    { title: "New Model Questions Added", bg: "bg-purple-500" }
-  ];
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent(prev => (prev + 1) % banners.length);
-    }, 10000);
-    return () => clearInterval(timer);
-  }, [banners.length]);
-
-  return (
-    <div className="relative w-full h-40 md:h-48 rounded-3xl overflow-hidden shadow-sm border-b-[6px] border-black/10">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.5 }}
-          className={cn("absolute inset-0 flex items-center p-6 text-white", banners[current].bg)}
-        >
-          <h2 className="text-2xl font-bold font-heading max-w-[70%]">{banners[current].title}</h2>
-        </motion.div>
-      </AnimatePresence>
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 z-10">
-        {banners.map((_, idx) => (
-          <div key={idx} className={cn("w-2 h-2 rounded-full transition-colors", idx === current ? "bg-white" : "bg-white/50")} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DailyStreak({ user }: { user: User | null }) {
+function StudentBanner({ user }: { user: User | null }) {
+  const navigate = useNavigate();
   const updateUser = useStore(state => state.updateUser);
   const todayDate = new Date().toISOString().split('T')[0];
   
@@ -132,57 +80,79 @@ function DailyStreak({ user }: { user: User | null }) {
   });
 
   return (
-    <motion.div 
-      whileHover={!isComplete ? { scale: 1.02 } : { scale: 1 }}
-      whileTap={!isComplete ? { scale: 0.98 } : { scale: 1 }}
-      onClick={handleCheckIn}
-      className={cn("card-duo p-5 relative overflow-hidden", !isComplete ? "cursor-pointer ring-2 ring-orange-500/50" : "")}
-    >
-      {!isComplete && (
-        <div className="absolute inset-0 bg-orange-500/5 hover:bg-orange-500/10 transition-colors" />
-      )}
-      <div className="relative z-10 flex justify-between items-start">
-        <div>
-          <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
-            <span className={cn("transition-transform duration-300", !isComplete ? "animate-pulse" : "scale-110")}>🔥</span> 
-            {streakCount}-Day Streak!
-          </h3>
-          <p className="text-sm font-bold text-foreground/70 mb-4">
-            {!isComplete ? "Tap to check in for today!" : message}
-          </p>
-        </div>
-        {!isComplete && (
-          <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-bounce">
-            Check In
+    <div className="card-duo overflow-hidden relative">
+      <div className="p-5 relative z-10 flex flex-col gap-4">
+        {/* Header Section Inside Banner */}
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex gap-4 items-center">
+             <div className="w-14 h-14 shrink-0 p-1 flex justify-center items-center">
+               <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-full h-full object-contain" />
+             </div>
+             <div>
+               <h1 className="text-xl font-heading font-bold text-foreground leading-tight">
+                 Good morning, {user?.name?.split(' ')[0] || "Student"} 👋
+               </h1>
+               <p className="text-sm font-bold text-foreground/70 mt-0.5">Let's learn something new!</p>
+             </div>
           </div>
-        )}
-      </div>
+          <button onClick={() => navigate('/settings')} className="w-10 h-10 shrink-0 rounded-full bg-background hover:bg-foreground/5 flex items-center justify-center transition-colors shadow-sm border-2 border-border mt-2">
+            <SettingsIcon className="w-5 h-5 text-foreground/70" />
+          </button>
+        </div>
 
-      <div className="flex justify-between items-center px-1 relative z-10 mt-2">
-        {days.map((day, i) => {
-          const isToday = day.date === todayDate;
-          // A somewhat simplified check: if it's today, depend on isComplete
-          // Ideally we'd store a history array, but for simple visualization let's just assume previous days correspond to the active streak
-          const isPastActive = isToday ? isComplete : i >= 7 - (isComplete ? streakCount : streakCount + 1);
+        <div className="h-px w-full bg-border/50 my-1" />
 
-          return (
-            <div key={day.date} className="flex flex-col items-center gap-1">
-              <div className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 border-2",
-                isPastActive 
-                  ? "bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/20 scale-110" 
-                  : isToday ? "border-orange-500 border-dashed text-orange-500 bg-orange-500/10" : "border-border text-foreground/40 bg-card"
-              )}>
-                {day.label}
-              </div>
-              <span className={cn("text-[10px] font-bold", isToday ? "text-orange-500" : "text-foreground/40")}>
-                {isToday ? "Today" : ""}
-              </span>
+        {/* Check-In/Streak Section */}
+        <motion.div 
+          whileHover={!isComplete ? { scale: 1.02 } : { scale: 1 }}
+          whileTap={!isComplete ? { scale: 0.98 } : { scale: 1 }}
+          onClick={handleCheckIn}
+          className={cn("p-4 rounded-3xl relative overflow-hidden transition-all", !isComplete ? "cursor-pointer bg-orange-500/10 ring-2 ring-orange-500/50" : "bg-background border-2 border-border/50")}
+        >
+          {!isComplete && (
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent pointer-events-none" />
+          )}
+          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+            <div>
+              <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
+                <span className={cn("transition-transform duration-300", !isComplete ? "animate-pulse" : "scale-110")}>🔥</span> 
+                {streakCount}-Day Streak!
+              </h3>
+              <p className="text-sm font-bold text-foreground/70">
+                {!isComplete ? "Tap to check in for today!" : message}
+              </p>
             </div>
-          );
-        })}
+            {!isComplete && (
+              <div className="bg-orange-500 text-white text-xs font-bold px-3 py-2 sm:py-1 rounded-full animate-bounce shadow-md self-start sm:self-auto text-center w-auto shrink-0">
+                Check In
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between items-center px-1 relative z-10">
+            {days.map((day, i) => {
+              const isToday = day.date === todayDate;
+              const isPastActive = isToday ? isComplete : i >= 7 - (isComplete ? streakCount : streakCount + 1);
+
+              return (
+                <div key={day.date} className="flex flex-col items-center gap-1">
+                  <div className={cn(
+                    "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 border-2",
+                    isPastActive 
+                      ? "bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/20 scale-110" 
+                      : isToday ? "border-orange-500 border-dashed text-orange-500 bg-orange-500/10" : "border-border text-foreground/40 bg-card"
+                  )}>
+                    {day.label}
+                  </div>
+                  <span className={cn("text-[10px] font-bold", isToday ? "text-orange-500" : "text-foreground/40")}>
+                    {isToday ? "Today" : ""}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -199,11 +169,19 @@ function FlashcardWidget() {
     }, 150);
   };
 
+  if (!card) {
+    return (
+      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide">
+        No flashcards available
+      </div>
+    );
+  }
+
   return (
     <div className="card-duo p-5 relative perspective-1000">
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-1 rounded-lg">{card.subject}</span>
-        <button onClick={handleNext} className="text-sm font-bold text-primary active:scale-95 transition-transform uppercase tracking-wide">Next Card</button>
+      <div className="flex justify-between items-start gap-2 mb-4">
+        <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-1 rounded-lg inline-block break-words">{card.subject}</span>
+        <button onClick={handleNext} className="text-sm font-bold text-primary active:scale-95 transition-transform uppercase tracking-wide shrink-0 whitespace-nowrap">Next Card</button>
       </div>
 
       <div 
@@ -223,24 +201,145 @@ function FlashcardWidget() {
 }
 
 function TriviaWidget() {
-  const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
-  
+  const [triviaState, setTriviaState] = useState<{
+    date: string;
+    questionIndices: number[];
+    currentIndex: number;
+    answers: Record<number, number>;
+  } | null>(null);
+
+  const [timeLeft, setTimeLeft] = useState<string>('');
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const diff = tomorrow.getTime() - now.getTime();
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeLeft(`${h}h ${m}m ${s}s`);
+    };
+    updateTimer();
+    const timerId = setInterval(updateTimer, 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
+  useEffect(() => {
+    const today = new Date().toLocaleDateString();
+    const stored = localStorage.getItem('dailyTrivia');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.date === today) {
+          setTriviaState(parsed);
+          return;
+        }
+      } catch (e) {}
+    }
+    
+    // Generate new 10 questions
+    const indices = Array.from({length: mockTriviaList.length}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    const selectedIndices = indices.slice(0, 10);
+    
+    const newState = {
+      date: today,
+      questionIndices: selectedIndices,
+      currentIndex: 0,
+      answers: {}
+    };
+    setTriviaState(newState);
+    localStorage.setItem('dailyTrivia', JSON.stringify(newState));
+  }, []);
+
   const handleSelect = (idx: number) => {
-    if (selectedOpt !== null) return;
-    setSelectedOpt(idx);
+    if (!triviaState) return;
+    const currentQIndex = triviaState.questionIndices[triviaState.currentIndex];
+    if (triviaState.answers[currentQIndex] !== undefined) return;
+    
+    const newState = {
+      ...triviaState,
+      answers: {
+        ...triviaState.answers,
+        [currentQIndex]: idx
+      }
+    };
+    setTriviaState(newState);
+    localStorage.setItem('dailyTrivia', JSON.stringify(newState));
   };
+
+  const handleNext = () => {
+    if (!triviaState) return;
+    const nextIndex = triviaState.currentIndex + 1;
+    const newState = {
+      ...triviaState,
+      currentIndex: nextIndex
+    };
+    setTriviaState(newState);
+    localStorage.setItem('dailyTrivia', JSON.stringify(newState));
+
+    if (nextIndex >= 10) {
+      import('canvas-confetti').then((confetti) => {
+        confetti.default({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#a855f7', '#3b82f6', '#ec4899', '#eab308']
+        });
+      });
+    }
+  };
+
+  if (!triviaState) return null;
+
+  if (triviaState.currentIndex >= 10) {
+    const score = Object.entries(triviaState.answers).filter(([qIdx, ans]) => mockTriviaList[parseInt(qIdx)].correctIndex === ans).length;
+    return (
+      <div className="card-duo p-8 text-center flex flex-col items-center">
+        <h3 className="font-heading font-bold text-2xl mb-2 flex items-center gap-2 text-purple-500">
+          <span>🎉</span> Trivia Complete!
+        </h3>
+        <p className="font-bold text-foreground/80 mb-6">You scored {score} out of 10.</p>
+        <div className="bg-primary/10 p-4 rounded-xl border-2 border-primary/20">
+          <p className="text-sm font-bold text-primary uppercase tracking-widest mb-1">Next Trivia In</p>
+          <p className="text-xl font-heading font-bold">{timeLeft}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentQIndex = triviaState.questionIndices[triviaState.currentIndex];
+  // Guard in case we somehow get undefined question
+  const question = mockTriviaList[currentQIndex];
+  if (!question) {
+    return (
+      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide">
+        No trivia available
+      </div>
+    );
+  }
+  const selectedOpt = triviaState.answers[currentQIndex];
 
   return (
     <div className="card-duo p-5">
-      <h3 className="font-heading font-bold text-xl mb-3 flex items-center gap-2 text-purple-500">
-        <span>🧠</span> Daily Trivia
-      </h3>
-      <p className="font-bold mb-4 text-foreground/80">{mockTrivia.questionText}</p>
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <h3 className="font-heading font-bold text-xl flex items-center gap-2 text-purple-500 leading-tight">
+          <span className="shrink-0">🧠</span> Daily Trivia
+        </h3>
+        <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shrink-0">
+          {triviaState.currentIndex + 1} / 10
+        </span>
+      </div>
+      <p className="font-bold mb-4 text-foreground/80">{question.questionText}</p>
       <div className="space-y-3">
-        {mockTrivia.options.map((opt, idx) => {
+        {question.options.map((opt, idx) => {
           let btnClass = "border-border border-b-4 bg-background hover:bg-card-foreground/5 text-foreground";
-          if (selectedOpt !== null) {
-            if (idx === mockTrivia.correctIndex) {
+          if (selectedOpt !== undefined) {
+            if (idx === question.correctIndex) {
               btnClass = "border-primary border-b-primary-dark bg-primary/10 text-primary";
             } else if (idx === selectedOpt) {
               btnClass = "border-error border-b-error bg-error/10 text-error";
@@ -254,17 +353,25 @@ function TriviaWidget() {
               key={idx}
               onClick={() => handleSelect(idx)}
               className={cn("w-full text-left p-3 rounded-2xl border-2 font-bold transition-all duration-200 active:border-b-2 active:translate-y-[2px]", btnClass)}
-              disabled={selectedOpt !== null}
+              disabled={selectedOpt !== undefined}
             >
               {opt}
             </button>
           );
         })}
       </div>
-      {selectedOpt !== null && (
-        <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="mt-4 p-4 bg-primary/10 rounded-2xl border-2 border-primary/20 text-sm font-medium">
-          <span className="font-bold text-primary block text-lg mb-1">{selectedOpt === mockTrivia.correctIndex ? 'Correct!' : 'Incorrect.'}</span> 
-          <span className="text-foreground/80 font-bold">{mockTrivia.explanation}</span>
+      {selectedOpt !== undefined && (
+        <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="mt-4 p-4 bg-primary/10 rounded-2xl border-2 border-primary/20 flex flex-col gap-3">
+          <div>
+            <span className="font-bold text-primary block text-lg mb-1">{selectedOpt === question.correctIndex ? 'Correct!' : 'Incorrect.'}</span> 
+            <span className="text-foreground/80 font-medium text-sm">{question.explanation}</span>
+          </div>
+          <button 
+            onClick={handleNext}
+            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl border-b-4 border-primary-dark active:border-b-0 active:translate-y-1 transition-all"
+          >
+            {triviaState.currentIndex === 9 ? 'Finish' : 'Next Question'}
+          </button>
         </motion.div>
       )}
     </div>
@@ -281,7 +388,7 @@ function ChessShortcut() {
         <p className="text-white/70 text-sm font-bold">Sharpen your mind between study sessions.</p>
       </div>
       
-      <div className="p-5 flex gap-3">
+      <div className="p-5 flex flex-col sm:flex-row gap-3">
         <Link to="/chess?mode=bot" className="flex-1 bg-white hover:bg-gray-100 text-[#1F2F36] py-3 rounded-2xl font-bold text-center border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wide">
           Play Bot
         </Link>

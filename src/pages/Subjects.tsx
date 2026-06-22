@@ -70,24 +70,30 @@ export default function Subjects() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {subjects.map(subject => {
-              const Icon = (Icons as any)[subject.icon] || Icons.Book;
-              return (
-                <button
-                  key={subject.id}
-                  onClick={() => navigate(`/subjects/${subject.id}`)}
-                  className="card-duo p-5 flex flex-col items-center text-center gap-3"
-                >
-                  <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-primary/20">
-                    <Icon className="w-8 h-8 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading font-bold text-lg leading-tight text-foreground">{subject.name}</h3>
-                    <p className="text-sm text-foreground/60 font-bold uppercase tracking-wide mt-1">{subject.chapterCount} Chapters</p>
-                  </div>
-                </button>
-              )
-            })}
+            {subjects.length > 0 ? (
+              subjects.map(subject => {
+                const Icon = (Icons as any)[subject.icon] || Icons.Book;
+                return (
+                  <button
+                    key={subject.id}
+                    onClick={() => navigate(`/subjects/${subject.id}`)}
+                    className="card-duo p-5 flex flex-col items-center text-center gap-3"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-primary/20 shrink-0">
+                      <Icon className="w-6 h-6 sm:w-8 sm:h-8 stroke-[2.5]" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-bold text-base sm:text-lg leading-tight text-foreground">{subject.name}</h3>
+                      <p className="text-[10px] sm:text-sm text-foreground/60 font-bold uppercase tracking-wide mt-1">{subject.chapterCount} Chapters</p>
+                    </div>
+                  </button>
+                )
+              })
+            ) : (
+              <div className="col-span-full py-12 text-center text-foreground/50 font-bold">
+                No subjects available for this grade yet.
+              </div>
+            )}
           </div>
         </>
       ) : (

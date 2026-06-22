@@ -52,6 +52,32 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
   }
+
+  /* Enhanced Scrollbar matching the app theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 8px;
+    border: 2px solid var(--background);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary-dark);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--background);
+  }
 }
 
 @layer utilities {
