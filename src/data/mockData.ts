@@ -8,6 +8,13 @@ export const mockSubjects: Subject[] = [
   { id: 's5', name: 'Social Studies', grade: 11, icon: 'Globe', chapterCount: 15 },
   { id: 's6', name: 'Accountancy', grade: 11, icon: 'Calculator', chapterCount: 16 },
   { id: 's7', name: 'Nepali', grade: 11, icon: 'Type', chapterCount: 11 },
+  { id: 's8', name: 'Computer Science', grade: 12, stream: 'Computer Science', icon: 'Laptop', chapterCount: 14 },
+  { id: 's9', name: 'Hotel Management', grade: 12, stream: 'Hotel Management', icon: 'Utensils', chapterCount: 12 },
+  { id: 's10', name: 'English', grade: 12, icon: 'BookOpen', chapterCount: 6 },
+  { id: 's11', name: 'Economics', grade: 12, icon: 'TrendingUp', chapterCount: 15 },
+  { id: 's12', name: 'Social Studies', grade: 12, icon: 'Globe', chapterCount: 13 },
+  { id: 's13', name: 'Accountancy', grade: 12, icon: 'Calculator', chapterCount: 18 },
+  { id: 's14', name: 'Nepali', grade: 12, icon: 'Type', chapterCount: 10 },
 ];
 
 export const mockChapters: Chapter[] = [
@@ -28,13 +35,35 @@ export const mockChapters: Chapter[] = [
     notesContent: '<h3>Binary, Octal, Decimal, Hexadecimal</h3><p>Computers use binary logic.</p>',
     summaryContent: 'Base-2 is binary. Base-10 is decimal.',
     progress: 30,
+  },
+  {
+    id: 'c3',
+    subjectId: 's8',
+    title: 'Database Management Systems',
+    orderIndex: 1,
+    notesContent: '<h3>Introduction to DBMS</h3><p>A DBMS stores, retrieves, and updates data in a database.</p>',
+    summaryContent: 'Databases organize data efficiently.',
+    progress: 10,
+  },
+  {
+    id: 'c4',
+    subjectId: 's8',
+    title: 'Networking',
+    orderIndex: 2,
+    notesContent: '<h3>Computer Networks</h3><p>Connecting computers together to share resources.</p>',
+    summaryContent: 'Networks allow communication between multiple devices.',
+    progress: 0,
   }
 ];
 
 export const mockFlashcards: Flashcard[] = [
   { id: 'f1', subject: 'Accountancy', front: 'Accounting Equation', back: 'Assets = Liabilities + Equity' },
   { id: 'f2', subject: 'Computer Science', front: 'What does CPU stand for?', back: 'Central Processing Unit' },
-  { id: 'f3', subject: 'Economics', front: 'Law of Demand', back: 'As price increases, quantity demanded decreases (ceteris paribus).' }
+  { id: 'f3', subject: 'Economics', front: 'Law of Demand', back: 'As price increases, quantity demanded decreases (ceteris paribus).' },
+  // Chapter specific flashcards
+  { id: 'f4', chapterId: 'c1', subject: 'Computer Science', front: 'What is a computer system?', back: 'Hardware and software working together to process data.' },
+  { id: 'f5', chapterId: 'c1', subject: 'Computer Science', front: 'Name 3 output devices.', back: 'Monitor, Printer, Speaker' },
+  { id: 'f6', chapterId: 'c2', subject: 'Computer Science', front: 'What is base-2?', back: 'Binary number system' }
 ];
 
 export const mockTrivia: TriviaQuestion = {

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Tv, FileText, Settings, BookMarked } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -13,6 +14,32 @@ const navItems = [
 
 export default function Layout() {
   const location = useLocation();
+  const { user } = useStore();
+
+  useEffect(() => {
+    if (!user?.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+
+    const [prefHour, prefMin] = (user.preferredStudyTime || '18:00').split(':').map(Number);
+    
+    // Check every minute
+    const interval = setInterval(() => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMin = now.getMinutes();
+      const currentDateString = now.toISOString().split('T')[0];
+      const lastNotifiedDate = localStorage.getItem('lastStudyNotificationDate');
+
+      if (currentHour === prefHour && currentMin === prefMin && lastNotifiedDate !== currentDateString) {
+        new Notification("Time to Study! 📚", {
+          body: "It's your preferred study time. Keep up your daily streak on Guruba!",
+          icon: "https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" // Guruba Logo
+        });
+        localStorage.setItem('lastStudyNotificationDate', currentDateString);
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [user?.notificationsEnabled, user?.preferredStudyTime]);
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground transition-colors duration-300">

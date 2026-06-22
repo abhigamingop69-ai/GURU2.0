@@ -16,7 +16,7 @@ export default function ChapterList() {
 
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen bg-background">
-      <header className="sticky top-0 bg-background/90 backdrop-blur-md z-10 p-4 border-b border-border flex items-center gap-3">
+      <header className="sticky top-0 bg-background/90 backdrop-blur-md z-50 p-4 border-b border-border flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-card active:scale-95 transition-all">
           <ArrowLeft className="w-6 h-6 text-foreground" />
         </button>
@@ -38,9 +38,18 @@ export default function ChapterList() {
                 <h3 className="font-bold text-xl leading-tight mb-3 text-foreground">{chapter.title}</h3>
                 
                 {/* Progress bar */}
-                <div className="h-3 w-full bg-border rounded-full overflow-hidden border border-border">
-                  <div className="h-full bg-primary rounded-full relative" style={{ width: `${chapter.progress}%` }}>
-                    <div className="absolute top-0 bottom-0 right-0 w-8 bg-white/20 -skew-x-12 translate-x-4"></div>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                      Progress
+                    </span>
+                    <span className="text-xs font-bold text-primary">{chapter.progress || 0}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-border/50 rounded-full overflow-hidden border border-border/50">
+                    <div className="h-full bg-primary rounded-full relative transition-all duration-1000 ease-out" style={{ width: `${chapter.progress || 0}%` }}>
+                      <div className="absolute top-0 bottom-0 right-0 w-8 bg-white/30 -skew-x-12 translate-x-4"></div>
+                    </div>
                   </div>
                 </div>
               </div>

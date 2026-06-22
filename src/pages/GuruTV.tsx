@@ -72,7 +72,7 @@ export default function GuruTV() {
 
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen">
-      <header className="sticky top-0 bg-background/90 backdrop-blur-md z-10 pt-4 pb-2 -mx-4 px-4">
+      <header className="sticky top-0 bg-background/90 backdrop-blur-md z-50 pt-4 pb-2 -mx-4 px-4">
         <h1 className="text-2xl font-heading font-bold mb-4">Guru TV</h1>
         
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-2 items-center">

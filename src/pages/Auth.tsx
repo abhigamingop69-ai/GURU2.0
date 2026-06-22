@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -18,24 +18,41 @@ export default function Auth() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mock Auth
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
     login('mock-jwt-token', {
       id: 'u1',
       name: isLogin ? 'Student' : name || 'Student',
       email,
       grade,
       stream,
-      streakCount: 0
+      streakCount: 2,
+      lastActiveDate: yesterdayStr,
+      badges: [
+        {
+          id: 'b1',
+          title: 'Early Bird',
+          description: 'Started your learning journey',
+          icon: 'Star',
+          dateEarned: yesterdayStr
+        }
+      ]
     });
     navigate('/welcome', { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col p-6 items-center justify-center">
-      <div className="w-full flex justify-center mb-6">
-        <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-24 object-contain hidden md:block" />
-        <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-20 object-contain block md:hidden" />
+    <div className="min-h-[100dvh] bg-background flex flex-col p-6 items-center justify-center overflow-y-auto overflow-x-hidden relative">
+      <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
+      
+      <div className="w-full flex justify-center mb-6 relative z-10">
+        <div className="w-24 h-24 md:w-32 md:h-32 bg-card rounded-full shadow-lg flex items-center justify-center p-4">
+          <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-full h-full object-contain drop-shadow-md" />
+        </div>
       </div>
-      <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-6 space-y-6 border border-border">
+      <div className="w-full max-w-sm bg-card/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-6 space-y-6 border border-white/20 relative z-10">
         
         <div className="flex bg-background rounded-full p-1 relative">
           <div className={cn(

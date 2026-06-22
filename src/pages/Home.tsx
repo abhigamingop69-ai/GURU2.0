@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Settings as SettingsIcon, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { mockFlashcards, mockTrivia } from '../data/mockData';
+import { User } from '../types';
 
 export default function Home() {
   const user = useStore(state => state.user);
@@ -13,7 +14,7 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-2xl mx-auto">
       {/* Header */}
-      <header className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-10 py-3 -mx-4 px-4 border-b border-white/5 md:border-transparent gap-4">
+      <header className="flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 py-3 -mx-4 px-4 border-b border-white/5 md:border-transparent gap-4">
         <div className="flex flex-col min-w-0">
           <div className="flex items-center mb-1">
             <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-16 object-contain md:hidden shrink-0" />
@@ -28,7 +29,7 @@ export default function Home() {
       </header>
 
       <AdBanner />
-      <DailyStreak streakCount={user?.streakCount || 0} />
+      <DailyStreak user={user} />
       <FlashcardWidget />
       <TriviaWidget />
       <ChessShortcut />
@@ -75,27 +76,113 @@ function AdBanner() {
   );
 }
 
-function DailyStreak({ streakCount }: { streakCount: number }) {
-  const isComplete = true; // mock for today
+function DailyStreak({ user }: { user: User | null }) {
+  const updateUser = useStore(state => state.updateUser);
+  const todayDate = new Date().toISOString().split('T')[0];
+  
+  const isComplete = user?.lastActiveDate === todayDate;
+  const streakCount = user?.streakCount || 0;
   const message = streakCount >= 7 ? "You're on fire! Don't break the chain." : streakCount > 0 ? "Keep it going!" : "Start your streak today!";
 
+  const handleCheckIn = () => {
+    if (isComplete) return;
+    
+    // Check if it was true yesterday, if so increment, otherwise start at 1
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayDate = yesterday.toISOString().split('T')[0];
+    
+    let newStreak = streakCount;
+    if (user?.lastActiveDate === yesterdayDate) {
+      newStreak++;
+    } else {
+      newStreak = 1;
+    }
+
+    let newBadges = user?.badges ? [...user.badges] : [];
+    if (newStreak >= 7 && !newBadges.find((b: { id: string }) => b.id === '7-day')) {
+      newBadges.push({
+        id: '7-day',
+        title: '7-Day Streak',
+        description: 'Studied for 7 consecutive days',
+        icon: 'Flame',
+        dateEarned: todayDate
+      });
+      // Trigger a small native notification if supported
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification("Achievement Unlocked! 🏆", { body: "You earned the 7-Day Streak badge!" });
+      }
+    }
+
+    updateUser({
+      streakCount: newStreak,
+      lastActiveDate: todayDate,
+      badges: newBadges
+    });
+  };
+
+  // Generate last 7 days including today
+  const days = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return {
+      label: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+      date: d.toISOString().split('T')[0]
+    };
+  });
+
   return (
-    <div className="card-duo p-5 cursor-pointer">
-      <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
-        <span>🔥</span> {streakCount}-Day Streak!
-      </h3>
-      <p className="text-sm font-bold text-foreground/70 mb-4">{message}</p>
-      <div className="flex justify-between items-center px-1">
-        {[...Array(7)].map((_, i) => (
-          <div key={i} className={cn(
-            "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-colors border-2",
-            i < Math.min(streakCount, 7) || (i===0 && isComplete) ? "bg-orange-500 border-orange-600 text-white" : "border-border text-foreground/40 bg-card"
-          )}>
-            {["M", "T", "W", "T", "F", "S", "S"][i]}
+    <motion.div 
+      whileHover={!isComplete ? { scale: 1.02 } : { scale: 1 }}
+      whileTap={!isComplete ? { scale: 0.98 } : { scale: 1 }}
+      onClick={handleCheckIn}
+      className={cn("card-duo p-5 relative overflow-hidden", !isComplete ? "cursor-pointer ring-2 ring-orange-500/50" : "")}
+    >
+      {!isComplete && (
+        <div className="absolute inset-0 bg-orange-500/5 hover:bg-orange-500/10 transition-colors" />
+      )}
+      <div className="relative z-10 flex justify-between items-start">
+        <div>
+          <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
+            <span className={cn("transition-transform duration-300", !isComplete ? "animate-pulse" : "scale-110")}>🔥</span> 
+            {streakCount}-Day Streak!
+          </h3>
+          <p className="text-sm font-bold text-foreground/70 mb-4">
+            {!isComplete ? "Tap to check in for today!" : message}
+          </p>
+        </div>
+        {!isComplete && (
+          <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-bounce">
+            Check In
           </div>
-        ))}
+        )}
       </div>
-    </div>
+
+      <div className="flex justify-between items-center px-1 relative z-10 mt-2">
+        {days.map((day, i) => {
+          const isToday = day.date === todayDate;
+          // A somewhat simplified check: if it's today, depend on isComplete
+          // Ideally we'd store a history array, but for simple visualization let's just assume previous days correspond to the active streak
+          const isPastActive = isToday ? isComplete : i >= 7 - (isComplete ? streakCount : streakCount + 1);
+
+          return (
+            <div key={day.date} className="flex flex-col items-center gap-1">
+              <div className={cn(
+                "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 border-2",
+                isPastActive 
+                  ? "bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/20 scale-110" 
+                  : isToday ? "border-orange-500 border-dashed text-orange-500 bg-orange-500/10" : "border-border text-foreground/40 bg-card"
+              )}>
+                {day.label}
+              </div>
+              <span className={cn("text-[10px] font-bold", isToday ? "text-orange-500" : "text-foreground/40")}>
+                {isToday ? "Today" : ""}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
   );
 }
 

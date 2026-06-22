@@ -8,7 +8,21 @@ export interface User {
   grade: Grade;
   stream: Stream;
   streakCount: number;
+  lastActiveDate?: string;
+  notificationsEnabled?: boolean;
+  preferredStudyTime?: string;
+  badges?: Badge[];
+  flashcardsPracticedToday?: number;
+  lastFlashcardDate?: string;
 }
+
+export type Badge = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  dateEarned: string;
+};
 
 export type Subject = {
   id: string;
@@ -52,6 +66,7 @@ export type ExamQuestion = {
 
 export type Flashcard = {
   id: string;
+  chapterId?: string;
   subject: string;
   front: string;
   back: string;

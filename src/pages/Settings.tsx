@@ -1,13 +1,55 @@
 import { useStore } from '../store/useStore';
 import { Stream } from '../types';
 import { cn } from '../lib/utils';
-import { Moon, User, BookOpen, Info, LogOut, X, PenTool, PlayCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Moon, User, BookOpen, Info, LogOut, X, PenTool, PlayCircle, Bell, FileDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { mockChapters, mockSubjects } from '../data/mockData';
 
 export default function Settings() {
   const { user, theme, setTheme, updateUser, logout } = useStore();
   const [modalType, setModalType] = useState<'none' | 'terms' | 'privacy' | 'profile' | 'logout'>('none');
   const [editName, setEditName] = useState(user?.name || '');
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    }
+  }, []);
+
+  const handleToggleNotifications = async () => {
+    if (!('Notification' in window)) {
+      alert('This browser does not support desktop notifications');
+      return;
+    }
+
+    if (user?.notificationsEnabled) {
+      updateUser({ notificationsEnabled: false });
+    } else {
+      let perm = notificationPermission;
+      if (perm === 'default') {
+        perm = await Notification.requestPermission();
+        setNotificationPermission(perm);
+      }
+      
+      if (perm === 'granted') {
+        updateUser({ notificationsEnabled: true, preferredStudyTime: user?.preferredStudyTime || '18:00' });
+        // Optional: Send a test notification
+        new Notification("You're all set!", {
+          body: "We'll remind you to study at your preferred time.",
+          icon: "/favicon.ico"
+        });
+      } else {
+        alert("Please enable notifications in your browser settings to use this feature.");
+      }
+    }
+  };
+
+  const handleStudyTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateUser({ preferredStudyTime: e.target.value });
+  };
 
   const handleLogout = () => {
     setModalType('logout');
@@ -16,6 +58,37 @@ export default function Settings() {
   const handleSaveProfile = () => {
     updateUser({ name: editName });
     setModalType('none');
+  };
+
+  const handleDownloadReport = () => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.text("Weekly Study Progress Report", 14, 20);
+    
+    doc.setFontSize(14);
+    doc.text(`Student: ${user?.name || 'Unknown'}`, 14, 30);
+    doc.text(`Stream: ${user?.stream || 'N/A'} - Grade: ${user?.grade || 'N/A'}`, 14, 38);
+    doc.text(`Current Streak: ${user?.streakCount || 0} days`, 14, 46);
+    
+    // Chapters with progress > 0
+    const inProgress = mockChapters.filter(c => c.progress > 0).sort((a, b) => b.progress - a.progress);
+    
+    const tableData = inProgress.map(ch => {
+      const subj = mockSubjects.find(s => s.id === ch.subjectId);
+      return [subj?.name || '-', ch.title, `${ch.progress}%`];
+    });
+
+    autoTable(doc, {
+      startY: 55,
+      head: [['Subject', 'Chapter', 'Progress']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [43, 108, 176] },
+    });
+    
+    doc.save(`Study_Report_${user?.name?.replace(/\s+/g, '_') || 'Student'}.pdf`);
   };
 
   return (
@@ -43,6 +116,48 @@ export default function Settings() {
         </div>
       </section>
 
+      {/* Reports Section */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-4">Reports</h2>
+        <div className="card-duo overflow-hidden border-b-4">
+          <button onClick={handleDownloadReport} className="w-full p-4 flex items-center justify-between text-left font-bold text-foreground hover:bg-card-foreground/5 transition-colors group">
+            <div className="flex items-center gap-3">
+              <FileDown className="w-6 h-6 text-primary" />
+              <span>Download Weekly Progress Report</span>
+            </div>
+            <span className="text-xs uppercase tracking-wider text-primary font-bold">PDF</span>
+          </button>
+        </div>
+      </section>
+
+      {/* Achievements Section */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-4">Achievements</h2>
+        <div className="card-duo p-4 border-b-4 relative overflow-hidden">
+          {(!user?.badges || user.badges.length === 0) ? (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 bg-card-foreground/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                <PenTool className="w-8 h-8 text-foreground/20" />
+              </div>
+              <p className="font-bold text-foreground/60">No badges yet.</p>
+              <p className="text-sm text-foreground/40 mt-1">Keep studying to earn your first badge!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {user.badges.map(badge => (
+                <div key={badge.id} className="flex flex-col items-center p-3 rounded-2xl bg-primary/5 border border-primary/10 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-primary text-white flex flex-col items-center justify-center shadow-sm mb-2 relative">
+                    <span className="text-xl font-black">{badge.icon === 'Flame' ? '🔥' : badge.icon === 'Star' ? '⭐' : badge.icon === 'Trophy' ? '🏆' : '📚'}</span>
+                  </div>
+                  <h4 className="font-bold text-xs leading-tight mb-1">{badge.title}</h4>
+                  <p className="text-[10px] text-foreground/50 font-medium">{badge.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Appearance Section */}
       <section className="space-y-3">
         <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-4">Appearance</h2>
@@ -65,6 +180,45 @@ export default function Settings() {
                 theme === 'dark' ? "translate-x-6" : "bg-foreground/20"
               )} />
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Notifications Section */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-4">Notifications</h2>
+        <div className="card-duo overflow-hidden border-b-4">
+          <div className="p-4 flex items-center justify-between border-b-2 border-border">
+            <div className="flex items-center gap-3">
+              <Bell className="w-6 h-6 text-foreground/70" />
+              <span className="font-bold">Daily Study Reminder</span>
+            </div>
+            
+            <button 
+              onClick={handleToggleNotifications}
+              className={cn(
+                "relative w-14 h-8 rounded-full transition-colors duration-300 border-2",
+                user?.notificationsEnabled ? "bg-primary border-primary" : "bg-card border-border"
+              )}
+            >
+              <div className={cn(
+                "absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white transition-transform duration-300 shadow-sm",
+                user?.notificationsEnabled ? "translate-x-6" : "bg-foreground/20"
+              )} />
+            </button>
+          </div>
+          
+          <div className={cn(
+            "p-4 flex items-center justify-between transition-all overflow-hidden",
+            user?.notificationsEnabled ? "max-h-24 opacity-100" : "max-h-0 opacity-0 py-0 border-transparent"
+          )}>
+            <span className="font-bold text-foreground/70 text-sm">Preferred Time</span>
+            <input 
+              type="time" 
+              value={user?.preferredStudyTime || '18:00'}
+              onChange={handleStudyTimeChange}
+              className="bg-card border-2 border-border rounded-xl px-3 py-1 font-bold focus:outline-none focus:border-primary"
+            />
           </div>
         </div>
       </section>

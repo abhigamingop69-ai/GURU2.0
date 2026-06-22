@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
-import { BookOpen, Tv, Settings, Target, Zap } from 'lucide-react';
+import { BookOpen, Tv, Settings, Target, Zap, ArrowRight } from 'lucide-react';
 
 const slides = [
-  { title: "Welcome to Guruba", desc: "Nepal's Educational Hub for Grade 11 & 12", icon: Zap, color: "text-yellow-500" },
-  { title: "Notes & Summaries", desc: "Structured study materials for every chapter.", icon: BookOpen, color: "text-blue-500" },
-  { title: "Guru TV", desc: "Learn by watching curated educational videos.", icon: Tv, color: "text-red-500" },
-  { title: "Exam Assets", desc: "Be exam-ready with model questions & answers.", icon: Target, color: "text-purple-500" },
-  { title: "Let's get started", desc: "Join thousands of students on their journey.", icon: Settings, color: "text-green-500" },
+  { title: "Welcome to Guruba", desc: "Nepal's Educational Hub for Grade 11 & 12. Get ready to excel.", icon: Zap, color: "text-amber-500", bg: "bg-amber-500/10" },
+  { title: "Notes & Summaries", desc: "Structured study materials, formulas, and chapter summaries.", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-500/10" },
+  { title: "Guru TV", desc: "Learn by watching curated educational videos from top educators.", icon: Tv, color: "text-rose-500", bg: "bg-rose-500/10" },
+  { title: "Exam Assets", desc: "Be exam-ready with model questions, past papers & solutions.", icon: Target, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+  { title: "Let's get started", desc: "Join thousands of students on their journey to top grades.", icon: Settings, color: "text-emerald-500", bg: "bg-emerald-500/10" },
 ];
 
 export default function Onboarding() {
@@ -31,62 +31,103 @@ export default function Onboarding() {
   const SlideIcon = slides[currentSlide].icon;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-between p-6 overflow-hidden">
-      <div className="w-full flex justify-end">
-        {currentSlide < slides.length - 1 && (
-          <button onClick={handleSkip} className="font-semibold text-foreground/60 hover:text-foreground">
+    <div className="min-h-[100dvh] bg-background flex flex-col p-6 overflow-y-auto overflow-x-hidden relative">
+      <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+      
+      <header className="w-full flex justify-end relative z-10">
+        {currentSlide < slides.length - 1 ? (
+          <button 
+            onClick={handleSkip} 
+            className="px-4 py-2 text-sm font-bold text-foreground/50 hover:text-foreground hover:bg-foreground/5 rounded-full transition-colors"
+          >
             Skip
           </button>
+        ) : (
+          <div className="h-9" /> // placeholder to keep height consistent
         )}
-      </div>
+      </header>
 
-      <div className="flex-1 w-full max-w-sm flex items-center justify-center relative">
+      <main className="flex-1 w-full max-w-md mx-auto flex flex-col justify-center relative z-10 py-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col items-center text-center space-y-6"
+            initial={{ opacity: 0, x: 40, filter: "blur(4px)" }}
+            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, x: -40, filter: "blur(4px)" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="flex flex-col items-center text-center space-y-8"
           >
-            <div className="w-48 h-48 rounded-full bg-card shadow-lg flex items-center justify-center mb-4">
+            <div className={cn("relative w-56 h-56 rounded-full flex items-center justify-center transition-colors duration-500", slides[currentSlide].bg)}>
                {currentSlide === 0 ? (
-                 <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-[11rem] h-[11rem] object-contain" />
+                 <motion.div 
+                   initial={{ scale: 0.8 }} 
+                   animate={{ scale: 1 }} 
+                   transition={{ type: "spring", stiffness: 200, damping: 12 }}
+                   className="w-full h-full p-6 flex flex-col items-center justify-center relative z-10"
+                 >
+                   <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-[12rem] h-[12rem] object-contain drop-shadow-2xl" />
+                 </motion.div>
                ) : (
-                 <SlideIcon className={cn("w-24 h-24", slides[currentSlide].color)} />
+                 <motion.div
+                   initial={{ scale: 0.5, rotate: -20 }}
+                   animate={{ scale: 1, rotate: 0 }}
+                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                 >
+                   <SlideIcon className={cn("w-28 h-28 drop-shadow-lg", slides[currentSlide].color)} />
+                 </motion.div>
                )}
+               {/* Decorative rings */}
+               <div className="absolute inset-0 rounded-full border border-current opacity-10 scale-110" />
+               <div className="absolute inset-0 rounded-full border border-current opacity-5 scale-125" />
             </div>
-            <h1 className="text-3xl font-heading font-bold text-foreground">
-              {slides[currentSlide].title}
-            </h1>
-            <p className="text-lg text-foreground/80 font-sans">
-              {slides[currentSlide].desc}
-            </p>
+
+            <div className="space-y-4 px-4 w-full">
+              <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl md:text-4xl font-heading font-black text-foreground tracking-tight"
+              >
+                {slides[currentSlide].title}
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-lg md:text-xl text-foreground/70 font-sans leading-relaxed"
+              >
+                {slides[currentSlide].desc}
+              </motion.p>
+            </div>
           </motion.div>
         </AnimatePresence>
-      </div>
+      </main>
 
-      <div className="w-full max-w-sm flex flex-col gap-8 pb-8">
-        <div className="flex justify-center gap-2">
+      <footer className="w-full max-w-md mx-auto flex flex-col gap-8 pb-4 relative z-10 mt-auto">
+        <div className="flex justify-center gap-3">
           {slides.map((_, idx) => (
-            <div
+            <button
               key={idx}
+              onClick={() => setCurrentSlide(idx)}
               className={cn(
-                "w-2.5 h-2.5 rounded-full transition-colors duration-300",
-                idx === currentSlide ? "bg-primary" : "bg-primary/20"
+                "h-2.5 rounded-full transition-all duration-300",
+                idx === currentSlide ? "w-8 bg-primary" : "w-2.5 bg-primary/20 hover:bg-primary/40"
               )}
+              aria-label={`Go to slide ${idx + 1}`}
             />
           ))}
         </div>
         
         <button
           onClick={handleNext}
-          className="w-full h-14 btn-primary text-lg"
+          className="w-full h-14 btn-primary text-lg flex items-center justify-center gap-2 group shadow-xl shadow-primary/20"
         >
-          {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
+          {currentSlide === slides.length - 1 ? "Get Started" : "Continue"}
+          {currentSlide < slides.length - 1 && (
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          )}
         </button>
-      </div>
+      </footer>
     </div>
   );
 }
