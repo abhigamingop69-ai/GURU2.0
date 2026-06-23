@@ -54,6 +54,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    touch-action: pan-x pan-y;
     @apply transition-colors duration-300;
   }
   
@@ -101,12 +102,12 @@
     backface-visibility: hidden;
   }
   .btn-primary {
-    @apply bg-primary text-white font-bold rounded-2xl active:translate-y-1 active:border-b-0 border-b-4 border-b-primary-dark transition-all flex items-center justify-center;
+    @apply bg-primary text-white font-bold rounded-2xl active:translate-y-1 active:scale-[0.98] active:border-b-0 border-b-4 border-b-primary-dark transition-all duration-150 ease-out flex items-center justify-center;
   }
   .btn-outline {
-    @apply bg-transparent text-primary font-bold rounded-2xl active:translate-y-1 active:border-b-0 border-b-4 border-2 border-border active:border-2 active:border-t-2 border-t-2 border-x-2 transition-all flex items-center justify-center;
+    @apply bg-transparent text-primary font-bold rounded-2xl active:translate-y-1 active:scale-[0.98] active:border-b-0 border-b-4 border-2 border-border active:border-2 active:border-t-2 border-t-2 border-x-2 transition-all duration-150 ease-out flex items-center justify-center;
   }
   .card-duo {
-    @apply bg-card border-2 border-border rounded-2xl shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-200 border-b-[6px];
+    @apply bg-card border-2 border-border rounded-2xl shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-out border-b-[6px];
   }
 }

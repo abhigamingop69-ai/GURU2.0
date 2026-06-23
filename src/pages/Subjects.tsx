@@ -6,6 +6,7 @@ import { cn } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { Search } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export default function Subjects() {
   const { user } = useStore();
@@ -62,8 +63,9 @@ export default function Subjects() {
               subjects.map(subject => {
                 const Icon = (Icons as any)[subject.icon] || Icons.Book;
                 return (
-                  <button
+                  <motion.button
                     key={subject.id}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => navigate(`/subjects/${subject.id}`)}
                     className="card-duo p-5 flex flex-col items-center text-center gap-3"
                   >
@@ -74,7 +76,7 @@ export default function Subjects() {
                       <h3 className="font-heading font-bold text-base sm:text-lg leading-tight text-foreground">{subject.name}</h3>
                       <p className="text-[10px] sm:text-sm text-foreground/60 font-bold uppercase tracking-wide mt-1">{subject.chapterCount} Chapters</p>
                     </div>
-                  </button>
+                  </motion.button>
                 )
               })
             ) : (
@@ -99,8 +101,9 @@ export default function Subjects() {
                 {searchResults.subjects.map(subject => {
                   const Icon = (Icons as any)[subject.icon] || Icons.Book;
                   return (
-                    <button
+                    <motion.button
                       key={subject.id}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => navigate(`/subjects/${subject.id}`)}
                       className="card-duo p-4 flex flex-col items-center text-center gap-2"
                     >
@@ -111,7 +114,7 @@ export default function Subjects() {
                         <h3 className="font-heading font-bold text-md leading-tight text-foreground">{subject.name}</h3>
                         <p className="text-xs text-foreground/60 font-bold uppercase tracking-wide mt-1">Grade {subject.grade} • {subject.chapterCount} Ch.</p>
                       </div>
-                    </button>
+                    </motion.button>
                   )
                 })}
               </div>
@@ -125,8 +128,9 @@ export default function Subjects() {
                 {searchResults.chapters.map(chapter => {
                   const subject = mockSubjects.find(s => s.id === chapter.subjectId);
                   return (
-                    <button
+                    <motion.button
                       key={chapter.id}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => navigate(`/subjects/${chapter.subjectId}/chapter/${chapter.id}`)}
                       className="card-duo p-4 flex flex-col sm:flex-row sm:items-center justify-between text-left gap-3 w-full"
                     >
@@ -141,7 +145,7 @@ export default function Subjects() {
                         <p className="text-sm text-foreground/70 mt-2 line-clamp-2">{chapter.summaryContent}</p>
                       </div>
                       <Icons.ChevronRight className="w-5 h-5 text-foreground/30 hidden sm:block stretch-0 shrink-0" />
-                    </button>
+                    </motion.button>
                   )
                 })}
               </div>

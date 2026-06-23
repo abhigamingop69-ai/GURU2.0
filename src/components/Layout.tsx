@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Tv, FileText, Settings, BookMarked } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import { motion } from 'motion/react';
 
 const navItems = [
   { icon: Home, label: 'Home', path: '/' },
@@ -11,6 +12,8 @@ const navItems = [
   { icon: FileText, label: 'Exams', path: '/exams' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
+
+const NavLink = motion.create(RouterNavLink);
 
 export default function Layout() {
   const location = useLocation();
@@ -54,8 +57,11 @@ export default function Layout() {
             <NavLink
               key={item.path}
               to={item.path}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className={({ isActive }) => cn(
-                "flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.95]",
+                "flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200",
                 isActive 
                   ? "bg-primary/10 text-primary border-2 border-primary/20 dark:bg-primary/20 dark:border-primary/30" 
                   : "text-foreground/70 hover:bg-card-foreground/5 hover:text-foreground border-2 border-transparent"
@@ -84,13 +90,15 @@ export default function Layout() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                whileTap={{ scale: 0.90 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className={({ isActive }) => cn(
-                  "flex flex-col items-center justify-center flex-1 h-full gap-1 active:scale-[0.90] transition-all duration-300 rounded-2xl",
+                  "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-300 rounded-2xl",
                   isActive ? "text-primary bg-primary/10" : "text-foreground/50 hover:bg-card-foreground/5"
                 )}
               >
-                <item.icon className={cn("w-6 h-6 transition-all duration-300", isActive && "scale-110 -translate-y-0.5")} fill={isActive ? "currentColor" : "none"} strokeWidth={isActive ? 2 : 2.5} />
-                {isActive && <span className="text-[10px] font-bold uppercase tracking-wider transition-all duration-300">{item.label}</span>}
+                <item.icon className={cn("w-6 h-6 transition-transform duration-300", isActive && "scale-110 -translate-y-0.5")} fill={isActive ? "currentColor" : "none"} strokeWidth={isActive ? 2 : 2.5} />
+                {isActive && <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] font-bold uppercase tracking-wider">{item.label}</motion.span>}
               </NavLink>
             )
           })}

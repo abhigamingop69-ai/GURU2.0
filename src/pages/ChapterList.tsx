@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { mockSubjects, mockChapters } from '../data/mockData';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
+import { motion } from 'motion/react';
 
 export default function ChapterList() {
   const { subjectId } = useParams();
@@ -14,6 +15,21 @@ export default function ChapterList() {
     return <div className="p-6">Subject not found.</div>;
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen bg-background">
       <header className="sticky top-0 bg-background/90 backdrop-blur-md z-50 p-4 border-b border-border flex items-center gap-3">
@@ -23,12 +39,14 @@ export default function ChapterList() {
         <h1 className="text-xl font-heading font-bold">{subject.name}</h1>
       </header>
 
-      <div className="flex flex-col p-4 gap-4">
+      <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col p-4 gap-4">
         {chapters.length === 0 ? (
           <p className="text-foreground/60 text-center py-10 font-bold uppercase tracking-wider">No chapters available for this subject yet.</p>
         ) : (
           chapters.map(chapter => (
-            <div 
+            <motion.div 
+              variants={item}
+              whileTap={{ scale: 0.98 }}
               key={chapter.id}
               onClick={() => navigate(`/subjects/${subjectId}/chapter/${chapter.id}`)}
               className="card-duo p-5 flex items-center justify-between cursor-pointer"
@@ -56,10 +74,10 @@ export default function ChapterList() {
               <div className="w-10 h-10 rounded-full bg-border/50 flex items-center justify-center flex-shrink-0 border-2 border-transparent">
                 <ChevronRight className="w-6 h-6 text-foreground/50 stroke-[2.5]" />
               </div>
-            </div>
+            </motion.div>
           ))
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

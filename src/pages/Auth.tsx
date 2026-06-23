@@ -5,6 +5,7 @@ import { cn } from "../lib/utils";
 import { Grade, Stream } from "../types";
 import { supabase } from "../lib/supabase";
 import { Eye, EyeOff } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -224,19 +225,20 @@ export default function Auth() {
                 </label>
                 <div className="flex gap-2">
                   {[11, 12].map((g) => (
-                    <button
+                    <motion.button
                       key={g}
                       type="button"
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => setGrade(g as Grade)}
                       className={cn(
-                        "flex-1 h-12 font-bold rounded-2xl transition-all border-2 border-b-4 active:border-b-2 active:translate-y-[2px]",
+                        "flex-1 h-12 font-bold rounded-2xl transition-all border-2 border-b-4",
                         grade === g
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border text-foreground/60",
                       )}
                     >
                       Grade {g}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>

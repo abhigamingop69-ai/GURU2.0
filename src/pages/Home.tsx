@@ -13,10 +13,18 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-6 max-w-2xl mx-auto">
-      <StudentBanner user={user} />
-      <FlashcardWidget />
-      <TriviaWidget />
-      <ChessShortcut />
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+        <StudentBanner user={user} />
+      </motion.div>
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}>
+        <FlashcardWidget />
+      </motion.div>
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 }}>
+        <TriviaWidget />
+      </motion.div>
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.3 }}>
+        <ChessShortcut />
+      </motion.div>
     </div>
   );
 }
@@ -349,14 +357,15 @@ function TriviaWidget() {
           }
 
           return (
-            <button
+            <motion.button
               key={idx}
+              whileTap={selectedOpt === undefined ? { scale: 0.95 } : {}}
               onClick={() => handleSelect(idx)}
-              className={cn("w-full text-left p-3 rounded-2xl border-2 font-bold transition-all duration-200 active:border-b-2 active:translate-y-[2px]", btnClass)}
+              className={cn("w-full text-left p-3 rounded-2xl border-2 font-bold transition-all duration-150 ease-out", btnClass)}
               disabled={selectedOpt !== undefined}
             >
               {opt}
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -366,12 +375,14 @@ function TriviaWidget() {
             <span className="font-bold text-primary block text-lg mb-1">{selectedOpt === question.correctIndex ? 'Correct!' : 'Incorrect.'}</span> 
             <span className="text-foreground/80 font-medium text-sm">{question.explanation}</span>
           </div>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleNext}
-            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl border-b-4 border-primary-dark active:border-b-0 active:translate-y-1 transition-all"
+            className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-xl border-b-4 border-primary-dark transition-all"
           >
             {triviaState.currentIndex === 9 ? 'Finish' : 'Next Question'}
-          </button>
+          </motion.button>
         </motion.div>
       )}
     </div>
