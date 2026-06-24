@@ -271,7 +271,7 @@ function TriviaWidget() {
     const currentQIndex = triviaState.questionIndices[triviaState.currentIndex];
     if (triviaState.answers[currentQIndex] !== undefined) return;
     
-    const isCorrect = idx === mockTriviaList[currentQIndex].correctAnswerIndex;
+    const isCorrect = idx === mockTriviaList[currentQIndex].correctIndex;
     if (isCorrect) {
       audio.playSuccess();
     } else {
