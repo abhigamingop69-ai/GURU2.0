@@ -4,12 +4,7 @@ import { Chess, Move } from 'chess.js';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
-
-// Piece SVGs mapping with text variation selector to force monochrome rendering
-const pieceMap: Record<string, string> = {
-  'p': '♟\uFE0E', 'n': '♞\uFE0E', 'b': '♝\uFE0E', 'r': '♜\uFE0E', 'q': '♛\uFE0E', 'k': '♚\uFE0E',
-  'P': '♟\uFE0E', 'N': '♞\uFE0E', 'B': '♝\uFE0E', 'R': '♜\uFE0E', 'Q': '♛\uFE0E', 'K': '♚\uFE0E'
-};
+import { ChessPiece } from '../components/ChessPiece';
 
 const pieceValues: Record<string, number> = {
   p: 10, n: 30, b: 30, r: 50, q: 90, k: 900,
@@ -292,10 +287,9 @@ export default function ChessGame() {
       <div className="flex flex-wrap items-center text-xl sm:text-2xl opacity-80 gap-[1px]">
         {sorted.map((p, i) => (
            <span key={i} 
-              className={cn("select-none leading-none -ml-1.5", isCapturingBlack ? "text-black drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]" : "text-white")}
-              style={{ WebkitTextStroke: isCapturingBlack ? '1px rgba(0,0,0,0.8)' : 'none', textShadow: isCapturingBlack ? 'none' : '0 1px 1px rgba(0,0,0,0.8)' }}
+              className="w-5 h-5 -ml-1.5 drop-shadow-md"
            >
-             {isCapturingBlack ? pieceMap[p] : pieceMap[p.toUpperCase()]}
+             <ChessPiece type={isCapturingBlack ? p : p.toUpperCase()} />
            </span>
         ))}
       </div>
@@ -318,12 +312,12 @@ export default function ChessGame() {
         {/* Top Player Info */}
         <div className="w-full max-w-md flex flex-col items-start mb-3">
            <div className="flex items-center gap-2 text-white w-full">
-             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-2xl border-2 transition-all duration-300 shrink-0", 
+             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center p-1.5 border-2 transition-all duration-300 shrink-0", 
                 (!isWhiteTurn && topColor === 'b') || (isWhiteTurn && topColor === 'w') 
                 ? (mode === 'bot' && topColor === 'b' ? "border-green-500 bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "border-red-500 bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.5)]") 
                 : "border-transparent bg-white/10"
              )}>
-               {topColor === 'w' ? pieceMap['K'] : pieceMap['k']}
+               <ChessPiece type={topColor === 'w' ? 'K' : 'k'} />
              </div>
              <span className="font-bold text-lg whitespace-nowrap">{topColor === 'w' ? 'White' : (mode === 'bot' ? 'Bot Level ' + (botLevel !== null ? BOT_LEVELS[botLevel] : '') : 'Black')}</span>
              
@@ -377,7 +371,7 @@ export default function ChessGame() {
                         <div className={cn("absolute rounded-full pointer-events-none z-10", piece ? "w-full h-full border-4 border-black/20 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.1)]" : "w-1/3 h-1/3 bg-black/20")} />
                       )}
                       {piece && (
-                        <motion.span 
+                        <motion.div 
                           layoutId={`piece-${pieceIds[square] || square}`}
                           animate={lastCapture?.square === square ? {
                             rotate: [0, -10, 10, -10, 10, 0],
@@ -385,18 +379,11 @@ export default function ChessGame() {
                           } : {
                             rotate: 0, scale: 1
                           }}
-                          className={cn(
-                            "relative z-10 select-none", 
-                            piece.color === 'w' ? "text-white" : "text-black drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
-                          )}
-                          style={{
-                             WebkitTextStroke: piece.color === 'w' ? '1px black' : 'none',
-                             textShadow: piece.color === 'w' ? '0 2px 2px rgba(0,0,0,0.5)' : 'none'
-                          }}
+                          className="relative z-10 w-full h-full p-1"
                           transition={lastCapture?.square === square ? { duration: 0.4 } : { type: "spring", stiffness: 400, damping: 25 }}
                         >
-                          {piece.color === 'w' ? pieceMap[piece.type.toUpperCase()] : pieceMap[piece.type]}
-                        </motion.span>
+                          <ChessPiece type={piece.color === 'w' ? piece.type.toUpperCase() : piece.type} />
+                        </motion.div>
                       )}
                    </div>
                  )
@@ -408,12 +395,12 @@ export default function ChessGame() {
         {/* Bottom Player Info */}
         <div className="w-full max-w-md flex flex-col items-start mt-3">
            <div className="flex items-center gap-2 text-white w-full">
-             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-2xl border-2 transition-all duration-300 shrink-0", 
+             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center p-1.5 border-2 transition-all duration-300 shrink-0", 
                 (!isWhiteTurn && bottomColor === 'b') || (isWhiteTurn && bottomColor === 'w') 
                 ? (mode === 'bot' && bottomColor === 'b' ? "border-green-500 bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "border-red-500 bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.5)]") 
                 : "border-transparent bg-white/10"
              )}>
-               {bottomColor === 'w' ? pieceMap['K'] : pieceMap['k']}
+               <ChessPiece type={bottomColor === 'w' ? 'K' : 'k'} />
              </div>
              <span className="font-bold text-lg whitespace-nowrap">{bottomColor === 'w' ? (mode === 'bot' ? 'You' : 'White') : 'Black'}</span>
              
@@ -425,14 +412,25 @@ export default function ChessGame() {
       </div>
 
       {game.isGameOver() && (
-        <div className="absolute inset-x-0 bottom-0 top-auto bg-black/90 p-8 flex flex-col items-center justify-center rounded-t-3xl text-white z-40">
-           <h2 className="text-3xl font-heading font-bold mb-2">Game Over</h2>
-           <p className="text-xl mb-8 opacity-80">
-             {game.isCheckmate() ? "Checkmate!" : "Draw"}
-           </p>
-           <button onClick={handleReset} className="w-full max-w-sm py-4 bg-[#7FA650] rounded-xl font-bold text-xl active:scale-95 shadow-[0_4px_0_#537133]">
-             Play Again
-           </button>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-card w-full max-w-sm rounded-3xl p-8 flex flex-col items-center shadow-2xl border-4 border-[#302E2B]"
+          >
+             <h2 className="text-4xl font-heading font-black mb-2 text-foreground">
+                {game.isCheckmate() ? "Checkmate!" : "Draw"}
+             </h2>
+             <p className="text-xl mb-8 font-bold text-foreground/70 text-center">
+               {game.isCheckmate() 
+                 ? `${game.turn() === 'w' ? 'Black' : 'White'} is victorious` 
+                 : "The game ends in a draw"
+               }
+             </p>
+             <button onClick={handleReset} className="w-full py-4 bg-[#7FA650] hover:bg-[#8CB759] rounded-2xl font-bold text-xl active:scale-95 shadow-[0_6px_0_#537133] active:shadow-[0_0px_0_#537133] active:translate-y-[6px] transition-all text-white">
+               Play Again
+             </button>
+          </motion.div>
         </div>
       )}
 

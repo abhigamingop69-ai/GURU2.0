@@ -82,16 +82,16 @@ export default function Layout() {
       {/* Main Content Area */}
       <main className="flex-1 w-full overflow-y-auto relative flex flex-col">
         {/* Mobile Top Header */}
-        <div className="md:hidden flex items-center justify-between p-4 bg-card border-b border-border sticky top-0 z-40 relative">
-          <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-8 object-contain relative z-10" />
+        <div className="md:hidden flex items-center justify-between px-4 py-2 min-h-[64px] bg-card border-b border-border sticky top-0 z-40 relative overflow-hidden">
+          <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-9 object-contain relative z-10" />
           
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
-            <img src="https://i.ibb.co/Pv139k1Y/Untitled-project-Photoroom.png" alt="Guruba Text" className="h-[80px] object-contain" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 flex items-center justify-center w-[120px]">
+            <img src="https://i.ibb.co/Pv139k1Y/Untitled-project-Photoroom.png" alt="Guruba Text" className="h-[48px] w-auto object-contain" />
           </div>
 
           <button 
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2.5 hover:bg-card-foreground/5 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center relative z-10"
+            className="p-2 hover:bg-card-foreground/5 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center relative z-10"
           >
             <Menu className="w-6 h-6" />
           </button>
