@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Chess, Move } from 'chess.js';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
@@ -25,13 +25,38 @@ export default function ChessGame() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
   const [botLevel, setBotLevel] = useState<number | null>(mode === 'bot' ? null : -1);
-  const [turnIndicator, setTurnIndicator] = useState<'w'|'b'|null>(null);
+  const [lastCapture, setLastCapture] = useState<{square: string, id: number} | null>(null);
+  const [isBotThinking, setIsBotThinking] = useState(false);
 
   const isWhiteTurn = game.turn() === 'w';
 
-  // Sound effects (Mock functions as audio files are not provided)
+  // Sound effects
   const playSound = (type: 'move' | 'capture') => {
-    // In a real app, instantiate Audio and play.
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      if (type === 'move') {
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      } else {
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      }
+      
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.2);
+    } catch (e) {}
   };
 
   const makeMove = useCallback((moveStr: string | {from: string, to: string, promotion?: string}) => {
@@ -39,10 +64,11 @@ export default function ChessGame() {
       const result = game.move(moveStr);
       if (result) {
         setGame(new Chess(game.fen())); // Force re-render
-        playSound(result.captured ? 'capture' : 'move');
-        
-        if (mode === 'local') {
-           setTurnIndicator(game.turn() === 'w' ? 'w' : 'b');
+        if (result.captured) {
+           playSound('capture');
+           setLastCapture({ square: result.to, id: Date.now() });
+        } else {
+           playSound('move');
         }
       }
     } catch (e) {
@@ -76,6 +102,74 @@ export default function ChessGame() {
       setLegalMoves([]);
     }
   };
+
+  const pieceIds = useMemo(() => {
+    const ids: Record<string, string> = {};
+    ['a','b','c','d','e','f','g','h'].forEach(file => {
+      [1,2,7,8].forEach(rank => {
+        ids[file + rank] = file + rank;
+      });
+    });
+    game.history({ verbose: true }).forEach(move => {
+      ids[move.to] = ids[move.from];
+      delete ids[move.from];
+      if (move.flags.includes('k')) {
+         if (move.color === 'w') { ids['f1'] = ids['h1']; delete ids['h1']; }
+         else { ids['f8'] = ids['h8']; delete ids['h8']; }
+      } else if (move.flags.includes('q')) {
+         if (move.color === 'w') { ids['d1'] = ids['a1']; delete ids['a1']; }
+         else { ids['d8'] = ids['a8']; delete ids['a8']; }
+      }
+    });
+    return ids;
+  }, [game.fen()]);
+
+  const capturedPieces = useMemo(() => {
+    const INITIAL_PIECES = {
+      w: { p: 8, n: 2, b: 2, r: 2, q: 1 },
+      b: { p: 8, n: 2, b: 2, r: 2, q: 1 }
+    };
+    const counts = {
+      w: { p: 0, n: 0, b: 0, r: 0, q: 0 },
+      b: { p: 0, n: 0, b: 0, r: 0, q: 0 }
+    };
+    const board = game.board();
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = board[r][c];
+        if (piece && piece.type !== 'k') {
+          counts[piece.color as 'w'|'b'][piece.type as 'p'|'n'|'b'|'r'|'q']++;
+        }
+      }
+    }
+    
+    const whiteCaptured: string[] = []; 
+    const blackCaptured: string[] = []; 
+
+    const processCaptured = (color: 'w'|'b', capturedList: string[]) => {
+      const types = ['q', 'r', 'b', 'n', 'p'] as const;
+      let extra = 0;
+      for (const type of types) {
+        if (type !== 'p') {
+          const diff = INITIAL_PIECES[color][type] - counts[color][type];
+          if (diff < 0) {
+            extra += -diff;
+          } else if (diff > 0) {
+            for (let i = 0; i < diff; i++) capturedList.push(type);
+          }
+        } else {
+           const diff = INITIAL_PIECES[color][type] - counts[color][type];
+           const actuallyCaptured = diff - extra;
+           for (let i = 0; i < actuallyCaptured; i++) capturedList.push(type);
+        }
+      }
+    };
+    
+    processCaptured('b', whiteCaptured);
+    processCaptured('w', blackCaptured);
+    
+    return { whiteCaptured, blackCaptured };
+  }, [game.fen()]);
 
   // Bot Logic - Basic Minimax
   const evaluateBoard = (chess: Chess) => {
@@ -121,15 +215,28 @@ export default function ChessGame() {
     }
   };
 
+  const BOT_LEVELS = ['Noob', 'Pro', 'God', 'Legend', 'Mythic', 'Titan', 'Immortal', 'Grandmaster', 'Engine'];
+
   useEffect(() => {
     if (mode === 'bot' && game.turn() === 'b' && !game.isGameOver() && botLevel !== null) {
+      setIsBotThinking(true);
       setTimeout(() => {
         const moves = game.moves();
         if (botLevel === 0) { // Noob (random)
           makeMove(moves[Math.floor(Math.random() * moves.length)]);
         } else {
-          // Determine depth based on level (Pro=1, God=2, Legend=3)
-          const depth = Math.min(botLevel, 3); // Capped at 3 to prevent main thread blocking in this basic impl
+          // Levels mapping logic
+          let depth = 1;
+          let randomNoise = 0.5;
+          if (botLevel === 1) { depth = 1; randomNoise = 0.2; } // Pro
+          if (botLevel === 2) { depth = 2; randomNoise = 0.2; } // God
+          if (botLevel === 3) { depth = 2; randomNoise = 0.05; } // Legend
+          if (botLevel === 4) { depth = 3; randomNoise = 0.1; } // Mythic
+          if (botLevel === 5) { depth = 3; randomNoise = 0.02; } // Titan
+          if (botLevel === 6) { depth = 3; randomNoise = 0; } // Immortal
+          if (botLevel === 7) { depth = 4; randomNoise = 0.05; } // Grandmaster
+          if (botLevel === 8) { depth = 4; randomNoise = 0; } // Engine
+          
           let bestMove = null;
           let bestValue = -Infinity;
           
@@ -140,8 +247,8 @@ export default function ChessGame() {
           for(let i=0; i<shuffledMoves.length; i++) {
             game.move(shuffledMoves[i]);
             const baseValue = minimax(game, depth - 1, -Infinity, Infinity, false);
-            // Add tiny random noise (0 to 0.1) to break ties among moves with equal evaluation
-            const boardValue = baseValue + (Math.random() * 0.1);
+            // Add tiny random noise to break ties among moves with equal evaluation
+            const boardValue = baseValue + (Math.random() * randomNoise);
             game.undo();
             if (boardValue > bestValue) {
                bestValue = boardValue;
@@ -151,26 +258,48 @@ export default function ChessGame() {
           if (!bestMove) bestMove = shuffledMoves[0];
           makeMove(bestMove);
         }
-      }, 500);
+        setIsBotThinking(false);
+      }, 50); // Small timeout to allow UI to render thinking state before main thread blocks
     }
   }, [game, mode, botLevel, makeMove]);
 
   // Render board
   const board = game.board();
-  const ranks = mode === 'local' && game.turn() === 'b' ? [1,2,3,4,5,6,7,8] : [8,7,6,5,4,3,2,1]; // Flip for local
-  const files = mode === 'local' && game.turn() === 'b' ? ['h','g','f','e','d','c','b','a'] : ['a','b','c','d','e','f','g','h'];
+  const ranks = [8,7,6,5,4,3,2,1]; // Never flip
+  const files = ['a','b','c','d','e','f','g','h'];
 
-  const isBottomWhite = ranks[0] === 8;
-  const topColor = isBottomWhite ? 'b' : 'w';
-  const bottomColor = isBottomWhite ? 'w' : 'b';
+  const isBottomWhite = true;
+  const topColor = 'b' as 'w' | 'b';
+  const bottomColor = 'w' as 'w' | 'b';
 
   const handleReset = () => {
     setGame(new Chess());
     setSelectedSquare(null);
     setLegalMoves([]);
-    if (mode === 'local') {
-      setTurnIndicator('w');
-    }
+  };
+
+  const renderCapturedPieces = (color: 'w'|'b') => {
+    const pieces = color === 'w' ? capturedPieces.whiteCaptured : capturedPieces.blackCaptured;
+    if (pieces.length === 0) return null;
+    
+    // Sort pieces: pawn, knight, bishop, rook, queen
+    const order: Record<string, number> = { 'p': 1, 'n': 2, 'b': 3, 'r': 4, 'q': 5 };
+    const sorted = [...pieces].sort((a, b) => order[a] - order[b]);
+
+    const isCapturingBlack = color === 'w';
+    
+    return (
+      <div className="flex flex-wrap items-center text-xl sm:text-2xl opacity-80 gap-[1px]">
+        {sorted.map((p, i) => (
+           <span key={i} 
+              className={cn("select-none leading-none -ml-1.5", isCapturingBlack ? "text-black drop-shadow-[0_1px_0_rgba(255,255,255,0.5)]" : "text-white")}
+              style={{ WebkitTextStroke: isCapturingBlack ? '1px rgba(0,0,0,0.8)' : 'none', textShadow: isCapturingBlack ? 'none' : '0 1px 1px rgba(0,0,0,0.8)' }}
+           >
+             {isCapturingBlack ? pieceMap[p] : pieceMap[p.toUpperCase()]}
+           </span>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -185,45 +314,34 @@ export default function ChessGame() {
         </button>
       </header>
 
-      {mode === 'bot' && botLevel === null && (
-        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10 p-6 text-white text-center">
-           <h2 className="text-3xl font-heading font-bold mb-8">Select Difficulty</h2>
-           <div className="flex flex-col gap-3 w-full max-w-sm">
-             {['Noob', 'Pro', 'God', 'Legend'].map((lvl, i) => (
-                <button 
-                  key={lvl} 
-                  onClick={() => setBotLevel(i)}
-                  className="w-full py-4 bg-[#7FA650] hover:bg-[#8CB759] rounded-xl font-bold text-xl transition-transform active:scale-95 text-white shadow-[0_4px_0_#537133]"
-                >
-                  {lvl}
-                </button>
-             ))}
-           </div>
-        </div>
-      )}
-
-      {turnIndicator && mode === 'local' && (
-        <div 
-          className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20 text-white cursor-pointer"
-          onClick={() => setTurnIndicator(null)}
-        >
-          <h2 className="text-4xl font-heading font-bold mb-4">{turnIndicator === 'w' ? "White's Turn" : "Black's Turn"}</h2>
-          <p className="opacity-70">Tap to show board</p>
-        </div>
-      )}
-
       <div className="flex-1 w-full flex flex-col items-center justify-center p-4">
         {/* Top Player Info */}
-        <div className="w-full max-w-md flex justify-between items-end mb-3">
-           <div className="flex items-center gap-2 text-white">
-             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-2xl">
+        <div className="w-full max-w-md flex flex-col items-start mb-3">
+           <div className="flex items-center gap-2 text-white w-full">
+             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-2xl border-2 transition-all duration-300 shrink-0", 
+                (!isWhiteTurn && topColor === 'b') || (isWhiteTurn && topColor === 'w') 
+                ? (mode === 'bot' && topColor === 'b' ? "border-green-500 bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "border-red-500 bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.5)]") 
+                : "border-transparent bg-white/10"
+             )}>
                {topColor === 'w' ? pieceMap['K'] : pieceMap['k']}
              </div>
-             <span className="font-bold text-lg">{topColor === 'w' ? 'White' : (mode === 'bot' ? 'Bot Level ' + (botLevel !== null ? ['Noob','Pro','God','Legend'][botLevel] : '') : 'Black')}</span>
+             <span className="font-bold text-lg whitespace-nowrap">{topColor === 'w' ? 'White' : (mode === 'bot' ? 'Bot Level ' + (botLevel !== null ? BOT_LEVELS[botLevel] : '') : 'Black')}</span>
+             
+             {isBotThinking && mode === 'bot' && topColor === 'b' && (
+               <div className="flex gap-1 ml-1 mr-2">
+                 <motion.div className="w-1.5 h-1.5 bg-white rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+                 <motion.div className="w-1.5 h-1.5 bg-white rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+                 <motion.div className="w-1.5 h-1.5 bg-white rounded-full" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+               </div>
+             )}
+
+             <div className="flex-1 flex justify-end pr-1">
+               {renderCapturedPieces(topColor as 'w'|'b')}
+             </div>
            </div>
         </div>
 
-        <div className="w-full max-w-md aspect-square flex flex-col relative" style={{boxShadow: '0 0 20px rgba(0,0,0,0.5)'}}>
+        <div className="w-full aspect-square flex flex-col relative z-0" style={{ maxWidth: 'min(100%, 28rem, 100vh - 16rem)', boxShadow: '0 0 20px rgba(0,0,0,0.5)'}}>
            {ranks.map((rank, ri) => (
              <div key={rank} className="flex-1 flex">
                {files.map((file, fi) => {
@@ -246,20 +364,36 @@ export default function ChessGame() {
                      )}
                      onClick={() => handleSquareClick(square)}
                    >
+                      {lastCapture?.square === square && (
+                        <motion.div 
+                          key={`capture-${lastCapture.id}`}
+                          initial={{ opacity: 0.8, scale: 0.5 }}
+                          animate={{ opacity: 0, scale: 1.5 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          className="absolute inset-0 bg-red-500 rounded-full z-0 pointer-events-none"
+                        />
+                      )}
                       {isLegalMove && (
-                        <div className={cn("absolute rounded-full pointer-events-none z-10", piece ? "w-full h-full border-4 border-black/20" : "w-1/3 h-1/3 bg-black/20")} />
+                        <div className={cn("absolute rounded-full pointer-events-none z-10", piece ? "w-full h-full border-4 border-black/20 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.1)]" : "w-1/3 h-1/3 bg-black/20")} />
                       )}
                       {piece && (
                         <motion.span 
-                          layoutId={`piece-${piece.type}-${piece.color}-${square}`}
+                          layoutId={`piece-${pieceIds[square] || square}`}
+                          animate={lastCapture?.square === square ? {
+                            rotate: [0, -10, 10, -10, 10, 0],
+                            scale: [1, 1.2, 1],
+                          } : {
+                            rotate: 0, scale: 1
+                          }}
                           className={cn(
-                            "relative z-0 select-none", 
+                            "relative z-10 select-none", 
                             piece.color === 'w' ? "text-white" : "text-black drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
                           )}
                           style={{
                              WebkitTextStroke: piece.color === 'w' ? '1px black' : 'none',
                              textShadow: piece.color === 'w' ? '0 2px 2px rgba(0,0,0,0.5)' : 'none'
                           }}
+                          transition={lastCapture?.square === square ? { duration: 0.4 } : { type: "spring", stiffness: 400, damping: 25 }}
                         >
                           {piece.color === 'w' ? pieceMap[piece.type.toUpperCase()] : pieceMap[piece.type]}
                         </motion.span>
@@ -272,12 +406,20 @@ export default function ChessGame() {
         </div>
         
         {/* Bottom Player Info */}
-        <div className="w-full max-w-md flex justify-between items-start mt-3">
-           <div className="flex items-center gap-2 text-white">
-             <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-2xl">
+        <div className="w-full max-w-md flex flex-col items-start mt-3">
+           <div className="flex items-center gap-2 text-white w-full">
+             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-2xl border-2 transition-all duration-300 shrink-0", 
+                (!isWhiteTurn && bottomColor === 'b') || (isWhiteTurn && bottomColor === 'w') 
+                ? (mode === 'bot' && bottomColor === 'b' ? "border-green-500 bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "border-red-500 bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.5)]") 
+                : "border-transparent bg-white/10"
+             )}>
                {bottomColor === 'w' ? pieceMap['K'] : pieceMap['k']}
              </div>
-             <span className="font-bold text-lg">{bottomColor === 'w' ? (mode === 'bot' ? 'You' : 'White') : 'Black'}</span>
+             <span className="font-bold text-lg whitespace-nowrap">{bottomColor === 'w' ? (mode === 'bot' ? 'You' : 'White') : 'Black'}</span>
+             
+             <div className="flex-1 flex justify-end pr-1">
+               {renderCapturedPieces(bottomColor as 'w'|'b')}
+             </div>
            </div>
         </div>
       </div>
@@ -291,6 +433,23 @@ export default function ChessGame() {
            <button onClick={handleReset} className="w-full max-w-sm py-4 bg-[#7FA650] rounded-xl font-bold text-xl active:scale-95 shadow-[0_4px_0_#537133]">
              Play Again
            </button>
+        </div>
+      )}
+
+      {mode === 'bot' && botLevel === null && (
+        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-50 p-6 text-white text-center">
+           <h2 className="text-3xl font-heading font-bold mb-4">Select Difficulty</h2>
+           <div className="flex flex-col gap-2 w-full max-w-sm max-h-[70vh] overflow-y-auto pr-2 pb-4">
+             {BOT_LEVELS.map((lvl, i) => (
+                <button 
+                  key={lvl} 
+                  onClick={() => setBotLevel(i)}
+                  className="w-full py-3 bg-[#7FA650] hover:bg-[#8CB759] rounded-xl font-bold text-lg transition-transform active:scale-95 text-white shadow-[0_4px_0_#537133] shrink-0"
+                >
+                  {lvl}
+                </button>
+             ))}
+           </div>
         </div>
       )}
     </div>
