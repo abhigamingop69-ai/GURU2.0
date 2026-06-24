@@ -303,13 +303,13 @@ export default function ChessGame() {
   };
 
   return (
-    <div className="fixed inset-0 bg-[#302E2B] z-50 flex flex-col items-center">
+    <div className="fixed inset-0 bg-[#302E2B] z-50 flex flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <header className="w-full flex items-center justify-between p-4 text-white">
-        <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-full active:scale-95">
+        <button onClick={() => navigate(-1)} className="p-2.5 bg-white/10 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <span className="font-heading font-bold text-lg">{mode === 'bot' ? 'vs Bot' : 'Local 1v1'}</span>
-        <button onClick={handleReset} className="p-2 bg-white/10 rounded-full active:scale-95">
+        <button onClick={handleReset} className="p-2.5 bg-white/10 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center">
           <RotateCcw className="w-6 h-6" />
         </button>
       </header>

@@ -103,7 +103,7 @@ function StudentBanner({ user }: { user: User | null }) {
                <p className="text-sm font-bold text-foreground/70 mt-0.5">Let's learn something new!</p>
              </div>
           </div>
-          <button onClick={() => navigate('/settings')} className="w-10 h-10 shrink-0 rounded-full bg-background hover:bg-foreground/5 flex items-center justify-center transition-colors shadow-sm border-2 border-border mt-2">
+          <button onClick={() => navigate('/settings')} className="w-11 h-11 shrink-0 rounded-full bg-background hover:bg-foreground/5 flex items-center justify-center transition-colors shadow-sm border-2 border-border mt-2">
             <SettingsIcon className="w-5 h-5 text-foreground/70" />
           </button>
         </div>
@@ -189,7 +189,7 @@ function FlashcardWidget() {
     <div className="card-duo p-5 relative perspective-1000">
       <div className="flex justify-between items-start gap-2 mb-4">
         <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-1 rounded-lg inline-block break-words">{card.subject}</span>
-        <button onClick={handleNext} className="text-sm font-bold text-primary active:scale-95 transition-transform uppercase tracking-wide shrink-0 whitespace-nowrap">Next Card</button>
+        <button onClick={handleNext} className="text-sm font-bold text-primary active:scale-95 transition-transform uppercase tracking-wide shrink-0 whitespace-nowrap p-2 min-h-[44px] min-w-[44px] flex items-center justify-center -m-2">Next Card</button>
       </div>
 
       <div 

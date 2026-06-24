@@ -33,7 +33,7 @@ export default function ChapterList() {
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen bg-background">
       <header className="sticky top-0 bg-background/90 backdrop-blur-md z-50 p-4 border-b border-border flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-card active:scale-95 transition-all">
+        <button onClick={() => navigate(-1)} className="p-2.5 -ml-2.5 rounded-full hover:bg-card active:scale-95 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center">
           <ArrowLeft className="w-6 h-6 text-foreground" />
         </button>
         <h1 className="text-xl font-heading font-bold">{subject.name}</h1>

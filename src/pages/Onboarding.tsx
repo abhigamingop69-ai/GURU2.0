@@ -31,7 +31,7 @@ export default function Onboarding() {
   const SlideIcon = slides[currentSlide].icon;
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col p-6 overflow-y-auto overflow-x-hidden relative">
+    <div className="min-h-[100dvh] bg-background flex flex-col p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] pr-[max(1.5rem,env(safe-area-inset-right))] overflow-y-auto overflow-x-hidden relative">
       <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
       
       <header className="w-full flex justify-end relative z-10">

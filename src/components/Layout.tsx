@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, NavLink as RouterNavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Tv, FileText, Settings, BookMarked } from 'lucide-react';
+import { Home, BookOpen, Tv, FileText, Settings, BookMarked, Menu, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { motion } from 'motion/react';
@@ -18,6 +18,11 @@ const NavLink = motion.create(RouterNavLink);
 export default function Layout() {
   const location = useLocation();
   const { user } = useStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!user?.notificationsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
@@ -45,7 +50,7 @@ export default function Layout() {
   }, [user?.notificationsEnabled, user?.preferredStudyTime]);
 
   return (
-    <div className="flex h-screen w-full bg-background text-foreground transition-colors duration-300">
+    <div className="flex h-[100dvh] w-full bg-background text-foreground transition-colors duration-300 pt-[env(safe-area-inset-top)]">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-border bg-card p-4">
         <div className="flex items-center px-2 mb-8 mt-2">
@@ -75,35 +80,69 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full overflow-y-auto pb-20 md:pb-0 relative">
-        <div className="max-w-screen-xl mx-auto min-h-full">
+      <main className="flex-1 w-full overflow-y-auto relative flex flex-col">
+        {/* Mobile Top Header */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-card border-b border-border sticky top-0 z-40 relative">
+          <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="h-8 object-contain relative z-10" />
+          
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
+            <img src="https://i.ibb.co/Pv139k1Y/Untitled-project-Photoroom.png" alt="Guruba Text" className="h-[80px] object-contain" />
+          </div>
+
+          <button 
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2.5 hover:bg-card-foreground/5 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center relative z-10"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="max-w-screen-xl mx-auto min-h-full w-full">
           <Outlet />
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t-2 border-border bg-card pb-safe px-2 z-50">
-        <div className="flex items-center justify-around h-16 pt-1 pb-1">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                whileTap={{ scale: 0.90 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className={({ isActive }) => cn(
-                  "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-300 rounded-2xl",
-                  isActive ? "text-primary bg-primary/10" : "text-foreground/50 hover:bg-card-foreground/5"
-                )}
-              >
-                <item.icon className={cn("w-6 h-6 transition-transform duration-300", isActive && "scale-110 -translate-y-0.5")} fill={isActive ? "currentColor" : "none"} strokeWidth={isActive ? 2 : 2.5} />
-                {isActive && <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] font-bold uppercase tracking-wider">{item.label}</motion.span>}
-              </NavLink>
-            )
-          })}
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar Drawer */}
+      <aside className={cn(
+        "md:hidden fixed top-0 bottom-0 right-0 w-64 bg-card border-l border-border z-50 p-4 pt-[max(1rem,env(safe-area-inset-top))] flex flex-col transition-transform duration-300 ease-in-out",
+        mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+      )}>
+        <div className="flex items-center justify-between px-2 mb-8 mt-2">
+          <span className="font-heading font-bold text-lg">Menu</span>
+          <button 
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2.5 hover:bg-card-foreground/5 rounded-full active:scale-95 transition-transform min-w-[44px] min-h-[44px] flex items-center justify-center"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
-      </nav>
+        
+        <nav className="flex flex-col gap-2 flex-1">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) => cn(
+                "flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200",
+                isActive 
+                  ? "bg-primary/10 text-primary border-2 border-primary/20" 
+                  : "text-foreground/70 hover:bg-card-foreground/5 hover:text-foreground border-2 border-transparent"
+              )}
+            >
+              <item.icon className="w-7 h-7" fill={location.pathname === item.path ? "currentColor" : "none"} strokeWidth={location.pathname === item.path ? 2 : 2.5} />
+              <span className="font-bold text-sm tracking-wide uppercase">{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
     </div>
   );
 }

@@ -297,7 +297,7 @@ export default function Settings() {
                  modalType === 'privacy' ? 'Privacy Policy' : 
                  modalType === 'logout' ? 'Logging Out' : 'Edit Profile'}
               </h2>
-              <button onClick={() => setModalType('none')} className="p-2 -mr-2 text-foreground/50 hover:bg-card-foreground/5 rounded-xl active:scale-95 transition-all">
+              <button onClick={() => setModalType('none')} className="p-2.5 -mr-2 text-foreground/50 hover:bg-card-foreground/5 rounded-xl active:scale-95 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <X className="w-6 h-6" />
               </button>
             </div>

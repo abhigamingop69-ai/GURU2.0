@@ -125,7 +125,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col p-6 items-center justify-center overflow-y-auto overflow-x-hidden relative">
+    <div className="min-h-[100dvh] bg-background flex flex-col p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] items-center justify-center overflow-y-auto overflow-x-hidden relative">
       <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
 
       <div className="w-full flex justify-center mb-6 relative z-10">
@@ -146,7 +146,7 @@ export default function Auth() {
           <button
             onClick={() => setIsLogin(true)}
             className={cn(
-              "flex-1 h-10 font-bold z-10 transition-colors",
+              "flex-1 h-11 font-bold z-10 transition-colors",
               isLogin ? "text-white" : "text-foreground/60",
             )}
           >
@@ -155,7 +155,7 @@ export default function Auth() {
           <button
             onClick={() => setIsLogin(false)}
             className={cn(
-              "flex-1 h-10 font-bold z-10 transition-colors",
+              "flex-1 h-11 font-bold z-10 transition-colors",
               !isLogin ? "text-white" : "text-foreground/60",
             )}
           >

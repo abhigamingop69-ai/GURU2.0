@@ -470,7 +470,7 @@ export default function ChapterDetail() {
   return (
     <div className="flex flex-col max-w-4xl mx-auto min-h-screen bg-background relative pb-24 md:pb-6">
       <header className="sticky top-0 bg-background/90 backdrop-blur-md z-50 p-4 border-b-2 border-border flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-2xl hover:bg-card active:scale-95 transition-all text-foreground/70 hover:text-foreground">
+        <button onClick={() => navigate(-1)} className="p-2.5 -ml-2.5 rounded-2xl hover:bg-card active:scale-95 transition-all text-foreground/70 hover:text-foreground min-w-[44px] min-h-[44px] flex items-center justify-center">
           <ArrowLeft className="w-6 h-6 stroke-[2.5]" />
         </button>
         <div className="flex flex-col min-w-0">
