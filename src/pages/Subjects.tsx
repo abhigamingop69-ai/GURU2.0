@@ -58,13 +58,30 @@ export default function Subjects() {
 
       {!searchQuery.trim() ? (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <motion.div 
+            initial="hidden" 
+            animate="show" 
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            className="grid grid-cols-2 md:grid-cols-3 gap-4"
+          >
             {subjects.length > 0 ? (
               subjects.map(subject => {
                 const Icon = (Icons as any)[subject.icon] || Icons.Book;
                 return (
                   <motion.button
                     key={subject.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                    }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate(`/subjects/${subject.id}`)}
                     className="card-duo p-5 flex flex-col items-center text-center gap-3"
@@ -84,7 +101,7 @@ export default function Subjects() {
                 No subjects available for this grade yet.
               </div>
             )}
-          </div>
+          </motion.div>
         </>
       ) : (
         <div className="space-y-8">
@@ -97,12 +114,24 @@ export default function Subjects() {
           {searchResults && searchResults.subjects.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-2">Matching Subjects</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <motion.div 
+                initial="hidden" 
+                animate="show" 
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                }}
+                className="grid grid-cols-2 md:grid-cols-3 gap-4"
+              >
                 {searchResults.subjects.map(subject => {
                   const Icon = (Icons as any)[subject.icon] || Icons.Book;
                   return (
                     <motion.button
                       key={subject.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                      }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => navigate(`/subjects/${subject.id}`)}
                       className="card-duo p-4 flex flex-col items-center text-center gap-2"
@@ -117,19 +146,31 @@ export default function Subjects() {
                     </motion.button>
                   )
                 })}
-              </div>
+              </motion.div>
             </div>
           )}
 
           {searchResults && searchResults.chapters.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-sm font-bold text-foreground/50 uppercase tracking-wider pl-2">Matching Chapters</h2>
-              <div className="flex flex-col gap-3">
+              <motion.div 
+                initial="hidden" 
+                animate="show" 
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                }}
+                className="flex flex-col gap-3"
+              >
                 {searchResults.chapters.map(chapter => {
                   const subject = mockSubjects.find(s => s.id === chapter.subjectId);
                   return (
                     <motion.button
                       key={chapter.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                      }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => navigate(`/subjects/${chapter.subjectId}/chapter/${chapter.id}`)}
                       className="card-duo p-4 flex flex-col sm:flex-row sm:items-center justify-between text-left gap-3 w-full"
@@ -148,7 +189,7 @@ export default function Subjects() {
                     </motion.button>
                   )
                 })}
-              </div>
+              </motion.div>
             </div>
           )}
         </div>
