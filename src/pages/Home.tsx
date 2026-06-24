@@ -91,19 +91,20 @@ function StudentBanner({ user }: { user: User | null }) {
     <div className="card-duo overflow-hidden relative">
       <div className="p-5 relative z-10 flex flex-col gap-4">
         {/* Header Section Inside Banner */}
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex gap-4 items-center">
-             <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 p-1 flex justify-center items-center">
+        <div className="flex justify-between items-start gap-2 sm:gap-4">
+          <div className="flex gap-3 sm:gap-4 items-center flex-1 min-w-0">
+             <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 shrink-0 p-0.5 sm:p-1 flex justify-center items-center">
                <img src="https://i.ibb.co/VYyZWwpp/Untitled-project-Photoroom.png" alt="Guruba Logo" className="w-full h-full object-contain" />
              </div>
-             <div>
-               <h1 className="text-xl font-heading font-bold text-foreground leading-tight">
-                 Good morning, {user?.name?.split(' ')[0] || "Student"} 👋
+             <div className="min-w-0 flex-1">
+               <h1 className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-foreground leading-tight">
+                 Good morning, <br className="sm:hidden" />
+                 <span className="inline-block align-bottom max-w-[150px] sm:max-w-[200px] truncate">{user?.name?.split(' ')[0] || "Student"}</span> 👋
                </h1>
-               <p className="text-sm font-bold text-foreground/70 mt-0.5">Let's learn something new!</p>
+               <p className="text-xs sm:text-sm font-bold text-foreground/70 mt-0.5 truncate">Let's learn something new!</p>
              </div>
           </div>
-          <button onClick={() => navigate('/settings')} className="w-11 h-11 shrink-0 rounded-full bg-background hover:bg-foreground/5 flex items-center justify-center transition-colors shadow-sm border-2 border-border mt-2">
+          <button onClick={() => navigate('/settings')} className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-background hover:bg-foreground/5 flex items-center justify-center transition-colors shadow-sm border-2 border-border mt-2">
             <SettingsIcon className="w-5 h-5 text-foreground/70" />
           </button>
         </div>
@@ -120,23 +121,23 @@ function StudentBanner({ user }: { user: User | null }) {
           {!isComplete && (
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent pointer-events-none" />
           )}
-          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+          <div className="relative z-10 flex sm:flex-row justify-between items-center sm:items-start gap-4 mb-4">
             <div>
-              <h3 className="font-heading font-bold text-xl mb-1 flex items-center gap-2 text-orange-500">
+              <h3 className="font-heading font-bold text-lg sm:text-xl mb-1 flex items-center gap-2 text-orange-500">
                 <span className={cn("transition-transform duration-300", !isComplete ? "animate-pulse" : "scale-110")}>🔥</span> 
                 {streakCount}-Day Streak!
               </h3>
-              <p className="text-sm font-bold text-foreground/70">
+              <p className="text-xs sm:text-sm font-bold text-foreground/70">
                 {!isComplete ? "Tap to check in for today!" : message}
               </p>
             </div>
             {!isComplete && (
-              <div className="bg-orange-500 text-white text-xs font-bold px-3 py-2 sm:py-1 rounded-full animate-bounce shadow-md self-start sm:self-auto text-center w-auto shrink-0">
+              <div className="bg-orange-500 text-white text-xs font-bold px-3 py-2 sm:py-2 rounded-full animate-bounce shadow-md shrink-0">
                 Check In
               </div>
             )}
           </div>
-          <div className="flex justify-between items-center px-1 relative z-10">
+          <div className="flex justify-between items-center relative z-10 max-w-sm mx-auto w-full">
             {days.map((day, i) => {
               const isToday = day.date === todayDate;
               const isPastActive = isToday ? isComplete : i >= 7 - (isComplete ? streakCount : streakCount + 1);
@@ -144,7 +145,7 @@ function StudentBanner({ user }: { user: User | null }) {
               return (
                 <div key={day.date} className="flex flex-col items-center gap-1">
                   <div className={cn(
-                    "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 border-2",
+                    "w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-500 border-2",
                     isPastActive 
                       ? "bg-orange-500 border-orange-600 text-white shadow-lg shadow-orange-500/20 scale-110" 
                       : isToday ? "border-orange-500 border-dashed text-orange-500 bg-orange-500/10" : "border-border text-foreground/40 bg-card"
@@ -179,7 +180,7 @@ function FlashcardWidget() {
 
   if (!card) {
     return (
-      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide">
+      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide text-sm">
         No flashcards available
       </div>
     );
@@ -325,7 +326,7 @@ function TriviaWidget() {
   const question = mockTriviaList[currentQIndex];
   if (!question) {
     return (
-      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide">
+      <div className="card-duo p-5 text-center text-foreground/50 font-bold uppercase tracking-wide text-sm">
         No trivia available
       </div>
     );

@@ -380,6 +380,17 @@ function PersonalNotes({ chapterId, chapterTitle }: { chapterId: string, chapter
   const [notes, setNotes] = useState(() => {
     return localStorage.getItem(`notes-${chapterId}`) || '';
   });
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem(`notes-${chapterId}`, notes);
+      setIsSaved(true);
+      const hideTimeout = setTimeout(() => setIsSaved(false), 2000);
+      return () => clearTimeout(hideTimeout);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [notes, chapterId]);
 
   const handleDownload = () => {
     const backupData = {
@@ -405,20 +416,31 @@ function PersonalNotes({ chapterId, chapterTitle }: { chapterId: string, chapter
         <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" /> Personal Notes
         </h2>
-        {notes.trim().length > 0 && (
-          <button onClick={handleDownload} className="text-xs font-bold text-primary hover:text-primary/80 uppercase tracking-widest flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-md hover:bg-primary/20 transition-colors">
-            <Download className="w-4 h-4" /> Backup JSON
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          <AnimatePresence>
+            {isSaved && (
+              <motion.span
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-xs font-bold text-primary mr-2"
+              >
+                Saved.
+              </motion.span>
+            )}
+          </AnimatePresence>
+          {notes.trim().length > 0 && (
+            <button onClick={handleDownload} className="text-xs font-bold text-primary hover:text-primary/80 uppercase tracking-widest flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-md hover:bg-primary/20 transition-colors">
+              <Download className="w-4 h-4" /> Backup JSON
+            </button>
+          )}
+        </div>
       </div>
       <div className="px-6 pb-6">
         <textarea
           value={notes}
-          onChange={(e) => {
-            setNotes(e.target.value);
-            localStorage.setItem(`notes-${chapterId}`, e.target.value);
-          }}
-          placeholder="Type your custom notes here..."
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Type your custom notes here... They will auto-save to this device."
           className="w-full min-h-[150px] bg-background border-2 border-border/50 rounded-xl p-4 text-sm font-medium focus:outline-none focus:border-primary/50 resize-y text-foreground"
         />
       </div>
