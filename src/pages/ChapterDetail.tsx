@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import { audio } from '../lib/audio';
 
 type QuizQuestion = {
   question: string;
@@ -63,11 +64,15 @@ function SmartQuiz({ chapterTitle }: { chapterTitle: string }) {
     setIsAnswered(true);
     if (quizData && index === quizData[currentQIndex].correctAnswerIndex) {
       setScore(s => s + 1);
+      audio.playSuccess();
+    } else {
+      audio.playError();
     }
   };
 
   const nextQuestion = () => {
     if (quizData && currentQIndex < quizData.length - 1) {
+      audio.playPop();
       setCurrentQIndex(currentQIndex + 1);
       setSelectedOption(null);
       setIsAnswered(false);
@@ -233,6 +238,8 @@ function SpacedFlashcards({ chapterId, chapterTitle }: { chapterId: string, chap
   const handleRating = (rating: 'hard' | 'good' | 'easy') => {
     const currentCard = queue[currentIndex];
     
+    audio.playPop();
+
     const newCount = practicedToday + 1;
     updateUser({
       flashcardsPracticedToday: newCount,

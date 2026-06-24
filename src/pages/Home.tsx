@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { mockFlashcards, mockTriviaList } from '../data/mockData';
 import { User } from '../types';
+import { audio } from '../lib/audio';
 
 export default function Home() {
   const user = useStore(state => state.user);
@@ -270,6 +271,13 @@ function TriviaWidget() {
     const currentQIndex = triviaState.questionIndices[triviaState.currentIndex];
     if (triviaState.answers[currentQIndex] !== undefined) return;
     
+    const isCorrect = idx === mockTriviaList[currentQIndex].correctAnswerIndex;
+    if (isCorrect) {
+      audio.playSuccess();
+    } else {
+      audio.playError();
+    }
+
     const newState = {
       ...triviaState,
       answers: {

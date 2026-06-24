@@ -5,6 +5,7 @@ import { ArrowLeft, RotateCcw } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { ChessPiece } from '../components/ChessPiece';
+import { audio } from '../lib/audio';
 
 const pieceValues: Record<string, number> = {
   p: 10, n: 30, b: 30, r: 50, q: 90, k: 900,
@@ -25,45 +26,20 @@ export default function ChessGame() {
 
   const isWhiteTurn = game.turn() === 'w';
 
-  // Sound effects
-  const playSound = (type: 'move' | 'capture') => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      if (type === 'move') {
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      } else {
-        oscillator.type = 'triangle';
-        oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
-        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-      }
-      
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2);
-    } catch (e) {}
-  };
-
   const makeMove = useCallback((moveStr: string | {from: string, to: string, promotion?: string}) => {
     try {
       const result = game.move(moveStr);
       if (result) {
         setGame(new Chess(game.fen())); // Force re-render
         if (result.captured) {
-           playSound('capture');
+           audio.playCapture();
            setLastCapture({ square: result.to, id: Date.now() });
         } else {
-           playSound('move');
+           audio.playThud();
+        }
+        
+        if (game.isGameOver()) {
+          setTimeout(() => audio.playFanfare(), 300);
         }
       }
     } catch (e) {
