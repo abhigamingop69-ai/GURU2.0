@@ -80,9 +80,9 @@ export const ChessPiece: React.FC<ChessPieceProps> = ({ type, className }) => {
   const extras = getExtras();
 
   return (
-    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-[0_2px_3px_rgba(0,0,0,0.3)]", className)}>
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full overflow-visible", className)}>
       <defs>
-        <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={filterId} x="-30%" y="-30%" width="160%" height="160%">
           {/* Inner Shadow (Bottom/Right) */}
           <feOffset dx="-5" dy="-8" in="SourceAlpha" result="innerOffset"/>
           <feComposite in="SourceAlpha" in2="innerOffset" operator="out" result="innerShadowMask"/>

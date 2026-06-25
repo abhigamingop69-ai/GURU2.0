@@ -263,7 +263,7 @@ export default function ChessGame() {
       <div className="flex flex-wrap items-center text-xl sm:text-2xl opacity-80 gap-[1px]">
         {sorted.map((p, i) => (
            <span key={i} 
-              className="w-5 h-5 -ml-1.5 drop-shadow-md"
+              className="w-5 h-5 -ml-1.5"
            >
              <ChessPiece type={isCapturingBlack ? p : p.toUpperCase()} />
            </span>

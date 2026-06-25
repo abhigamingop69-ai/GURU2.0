@@ -24,7 +24,7 @@ export const useStore = create<AppState>()(
       user: null,
       sessionToken: null,
       onboardingComplete: false,
-      theme: 'light',
+      theme: 'dark',
       selectedGrade: null,
 
       login: (token, user) => set({ sessionToken: token, user, selectedGrade: user.grade }),
