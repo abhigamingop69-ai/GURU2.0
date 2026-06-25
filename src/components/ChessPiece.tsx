@@ -85,13 +85,13 @@ export const ChessPiece: React.FC<ChessPieceProps> = ({ type, className }) => {
         <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
           {/* Inner Shadow (Bottom/Right) */}
           <feOffset dx="-5" dy="-8" in="SourceAlpha" result="innerOffset"/>
-          <feComposite in2="SourceAlpha" in="innerOffset" operator="arithmetic" k2="-1" k3="1" result="innerShadowMask"/>
+          <feComposite in="SourceAlpha" in2="innerOffset" operator="out" result="innerShadowMask"/>
           <feFlood floodColor={shadowFill} floodOpacity="1" result="innerShadowColor"/>
           <feComposite in="innerShadowColor" in2="innerShadowMask" operator="in" result="innerShadow"/>
 
           {/* Inner Highlight (Top/Left) */}
           <feOffset dx="4" dy="5" in="SourceAlpha" result="highlightOffset"/>
-          <feComposite in2="SourceAlpha" in="highlightOffset" operator="arithmetic" k2="-1" k3="1" result="highlightMask"/>
+          <feComposite in="SourceAlpha" in2="highlightOffset" operator="out" result="highlightMask"/>
           <feFlood floodColor={highlight} floodOpacity="1" result="highlightColor"/>
           <feComposite in="highlightColor" in2="highlightMask" operator="in" result="highlight"/>
 
