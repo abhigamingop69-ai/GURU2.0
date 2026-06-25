@@ -346,26 +346,46 @@ export default function ChessGame() {
                       {isLegalMove && (
                         <div className={cn("absolute rounded-full pointer-events-none z-10", piece ? "w-full h-full border-4 border-black/20 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.1)]" : "w-1/3 h-1/3 bg-black/20")} />
                       )}
-                      {piece && (
-                        <motion.div 
-                          layoutId={`piece-${pieceIds[square] || square}`}
-                          animate={lastCapture?.square === square ? {
-                            rotate: [0, -10, 10, -10, 10, 0],
-                            scale: [1, 1.2, 1],
-                          } : {
-                            rotate: 0, scale: 1
-                          }}
-                          className="relative z-10 w-full h-full p-1"
-                          transition={lastCapture?.square === square ? { duration: 0.4 } : { type: "spring", stiffness: 400, damping: 25 }}
-                        >
-                          <ChessPiece type={piece.color === 'w' ? piece.type.toUpperCase() : piece.type} />
-                        </motion.div>
-                      )}
                    </div>
                  )
                })}
              </div>
            ))}
+           
+           {/* Absolute overlay for pieces with CSS transitions */}
+           {ranks.map((rank, ri) => 
+             files.map((file, fi) => {
+               const square = (file + rank) as string;
+               const piece = game.get(square as any);
+               if (!piece) return null;
+               
+               const key = `piece-${pieceIds[square] || square}`;
+               
+               return (
+                 <div
+                   key={key}
+                   className="absolute w-[12.5%] h-[12.5%] p-1 z-10 pointer-events-none transition-all duration-300 ease-in-out"
+                   style={{
+                     left: `${fi * 12.5}%`,
+                     top: `${ri * 12.5}%`
+                   }}
+                 >
+                   <motion.div 
+                     animate={lastCapture?.square === square ? {
+                       rotate: [0, -10, 10, -10, 10, 0],
+                       scale: [1, 1.2, 1],
+                     } : {
+                       rotate: 0, scale: 1
+                     }}
+                     className="w-full h-full"
+                     transition={{ duration: 0.4 }}
+                   >
+                     <ChessPiece type={piece.color === 'w' ? piece.type.toUpperCase() : piece.type} />
+                   </motion.div>
+                 </div>
+               );
+             })
+           )}
         </div>
         
         {/* Bottom Player Info */}
