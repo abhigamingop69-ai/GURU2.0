@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { mockVideos, mockSubjects } from '../data/mockData';
-import { PlayCircle } from 'lucide-react';
+import { PlayCircle, ArrowLeft } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 
@@ -25,7 +25,7 @@ export default function GuruTV() {
   if (activeVideo) {
     const video = mockVideos.find(v => v.id === activeVideo);
     return (
-      <div className="flex flex-col min-h-screen bg-black">
+      <div className="flex flex-col min-h-screen bg-black relative pb-20">
         <div className="w-full aspect-video sticky top-0 z-20 bg-black">
           <iframe
             className="w-full h-full"
@@ -36,15 +36,26 @@ export default function GuruTV() {
             allowFullScreen
           ></iframe>
         </div>
-        <div className="p-4 text-white">
-          <h1 className="text-xl font-heading font-bold mb-2">{video?.title}</h1>
+        
+        <div className="flex items-center justify-between p-4 bg-black text-white">
+          <h1 className="text-xl font-heading font-bold line-clamp-2">{video?.title}</h1>
+          <button 
+            onClick={() => setActiveVideo(null)} 
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors shrink-0 ml-4 flex items-center justify-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-bold pr-2 hidden sm:block">Close</span>
+          </button>
+        </div>
+        
+        <div className="px-4 text-white">
           <p className="text-sm text-gray-400 mb-4">{video?.channelName} • {video?.duration}</p>
           <p className="text-sm text-gray-200">{video?.description}</p>
         </div>
         
         <div className="p-4 mt-4 border-t border-gray-800">
           <h3 className="font-heading font-bold text-white mb-4">More Videos</h3>
-          <div className="flex flex-col gap-4 pb-20">
+          <div className="flex flex-col gap-4">
             {filteredVideos.filter(v => v.id !== activeVideo).map(v => (
               <button key={v.id} onClick={() => setActiveVideo(v.id)} className="flex gap-3 text-left active:scale-95 transition-transform">
                 <div className="w-32 aspect-video bg-gray-800 rounded-lg overflow-hidden shrink-0">
@@ -58,14 +69,6 @@ export default function GuruTV() {
             ))}
           </div>
         </div>
-        
-        {/* Back Button Overlay */}
-        <button 
-          onClick={() => setActiveVideo(null)} 
-          className="fixed top-4 left-4 z-50 bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full font-bold text-sm border border-white/20 active:scale-95"
-        >
-          Close Video
-        </button>
       </div>
     );
   }

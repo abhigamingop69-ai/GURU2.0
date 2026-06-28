@@ -7,6 +7,7 @@ import { cn } from '../lib/utils';
 import { mockFlashcards, mockTriviaList } from '../data/mockData';
 import { User } from '../types';
 import { audio } from '../lib/audio';
+import { ActivityChart } from '../components/ActivityChart';
 
 export default function Home() {
   const user = useStore(state => state.user);
@@ -18,13 +19,21 @@ export default function Home() {
         <StudentBanner user={user} />
       </motion.div>
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.1 }}>
-        <FlashcardWidget />
+        <ActivityChart />
       </motion.div>
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 }}>
-        <TriviaWidget />
+        <FlashcardWidget />
       </motion.div>
       <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.3 }}>
-        <ChessShortcut />
+        <TriviaWidget />
+      </motion.div>
+      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.4 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <FocusShortcut />
+          <ScratchpadShortcut />
+          <FormulasShortcut />
+          <ChessShortcut />
+        </div>
       </motion.div>
     </div>
   );
@@ -398,24 +407,66 @@ function TriviaWidget() {
   );
 }
 
+function FocusShortcut() {
+  return (
+    <Link to="/focus" className="block h-full group">
+      <div className="bg-[#E8F5E9] dark:bg-[#1B2F22] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#A5D6A7] dark:border-[#2D4A36] h-full transition-transform active:scale-[0.98] hover:-translate-y-1">
+        <div className="p-5 h-full flex flex-col justify-center items-center text-center">
+          <div className="w-16 h-16 bg-[#C8E6C9] dark:bg-[#26402E] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <span className="text-3xl">🧘‍♂️</span>
+          </div>
+          <h3 className="font-heading font-bold text-xl mb-1 text-[#2E7D32] dark:text-[#81C784]">Focus Room</h3>
+          <p className="text-[#388E3C] dark:text-[#A5D6A7] text-xs font-bold px-2">Pomodoro timer & ambient sounds</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ScratchpadShortcut() {
+  return (
+    <Link to="/scratchpad" className="block h-full group">
+      <div className="bg-[#FFF3E0] dark:bg-[#3E2723] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#FFCC80] dark:border-[#5D4037] h-full transition-transform active:scale-[0.98] hover:-translate-y-1">
+        <div className="p-5 h-full flex flex-col justify-center items-center text-center">
+          <div className="w-16 h-16 bg-[#FFE0B2] dark:bg-[#4E342E] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <span className="text-3xl">✍️</span>
+          </div>
+          <h3 className="font-heading font-bold text-xl mb-1 text-[#E65100] dark:text-[#FFB74D]">Scratchpad</h3>
+          <p className="text-[#EF6C00] dark:text-[#FFCC80] text-xs font-bold px-2">Quick notes & math problems</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function FormulasShortcut() {
+  return (
+    <Link to="/formulas" className="block h-full group">
+      <div className="bg-[#E3F2FD] dark:bg-[#0D47A1] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#90CAF9] dark:border-[#1565C0] h-full transition-transform active:scale-[0.98] hover:-translate-y-1">
+        <div className="p-5 h-full flex flex-col justify-center items-center text-center">
+          <div className="w-16 h-16 bg-[#BBDEFB] dark:bg-[#1976D2] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <span className="text-3xl">🧮</span>
+          </div>
+          <h3 className="font-heading font-bold text-xl mb-1 text-[#1565C0] dark:text-[#90CAF9]">Formulas</h3>
+          <p className="text-[#1976D2] dark:text-[#BBDEFB] text-xs font-bold px-2">Cheat sheet for math & physics</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function ChessShortcut() {
   return (
-    <div className="bg-[#1F2F36] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#2A3F48] text-white">
-      <div className="p-5 pb-0 flex flex-col items-center text-center">
-        <h3 className="font-heading font-bold text-2xl flex items-center gap-2 mb-2">
-          <span className="text-3xl">♞</span> Chess Corner
-        </h3>
-        <p className="text-white/70 text-sm font-bold">Sharpen your mind between study sessions.</p>
+    <Link to="/chess" className="block h-full group">
+      <div className="bg-[#ECEFF1] dark:bg-[#263238] rounded-3xl overflow-hidden shadow-sm border-2 border-b-[6px] border-[#B0BEC5] dark:border-[#37474F] h-full transition-transform active:scale-[0.98] hover:-translate-y-1">
+        <div className="p-5 h-full flex flex-col justify-center items-center text-center">
+          <div className="w-16 h-16 bg-[#CFD8DC] dark:bg-[#37474F] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <span className="text-3xl">♞</span>
+          </div>
+          <h3 className="font-heading font-bold text-xl mb-1 text-[#37474F] dark:text-[#ECEFF1]">Chess</h3>
+          <p className="text-[#455A64] dark:text-[#CFD8DC] text-xs font-bold px-2">Sharpen your mind</p>
+        </div>
       </div>
-      
-      <div className="p-5 flex flex-col sm:flex-row gap-3">
-        <Link to="/chess?mode=bot" className="flex-1 bg-white hover:bg-gray-100 text-[#1F2F36] py-3 rounded-2xl font-bold text-center border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wide">
-          Play Bot
-        </Link>
-        <Link to="/chess?mode=local" className="flex-1 bg-[#2A3F48] hover:bg-[#324b55] py-3 rounded-2xl font-bold text-center border-b-4 border-[#1F2F36] active:border-b-0 active:translate-y-1 transition-all uppercase tracking-wide">
-          1v1 Local
-        </Link>
-      </div>
-    </div>
+    </Link>
   );
 }

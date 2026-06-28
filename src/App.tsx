@@ -13,6 +13,9 @@ import ExamAssets from './pages/ExamAssets';
 import Settings from './pages/Settings';
 import Welcome from './pages/Welcome';
 import ChessGame from './pages/ChessGame';
+import FocusRoom from './pages/FocusRoom';
+import Scratchpad from './pages/Scratchpad';
+import Formulas from './pages/Formulas';
 
 export default function App() {
   const { sessionToken, onboardingComplete, theme } = useStore();
@@ -37,6 +40,9 @@ export default function App() {
     <Routes>
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/chess" element={<ChessGame />} />
+      <Route path="/focus" element={<FocusRoom />} />
+      <Route path="/scratchpad" element={<Scratchpad />} />
+      <Route path="/formulas" element={<Formulas />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/subjects" element={<Subjects />} />
